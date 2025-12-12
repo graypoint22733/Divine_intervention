@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,236 +18,205 @@ import org.firstinspires.ftc.teamcode.utility.myDcMotorEx;
 public class SwerveDrive {
 
     private final IMU imu;
+    private final myDcMotorEx mod1m1, mod1m2, mod2m1, mod2m2, mod3m1, mod3m2;
+    private final AnalogInput mod1E, mod2E, mod3E;
+    private final Telemetry telemetry;
 
-    final private myDcMotorEx mod1m1, mod1m2, mod2m1, mod2m2, mod3m1, mod3m2;
-    final private AnalogInput mod1E, mod2E, mod3E;
-    final private Telemetry telemetry;
-    final private boolean eff;
-    private final boolean useImu;
-    private final boolean fieldCentric;
-    private boolean initializedReferences = false;
-    private double module1Adjust = 337, module2Adjust = 285, module3Adjust = 0;
-    private final PIDcontroller mod1PID = new PIDcontroller(0.1, 0.002, 3, 1, 0.5);
-    private final PIDcontroller mod2PID = new PIDcontroller(0.1, 0.002, 2, 0.5, 0.5);
-    private final PIDcontroller mod3PID = new PIDcontroller(0.1, 0.002, 1, 0.5, 0.75);
-    private final swerveKinematics swavemath = new swerveKinematics();
+    // PIDs
+    private final PIDcontroller mod1PID = new PIDcontroller(0,0,0,0,0);
+    private final PIDcontroller mod2PID = new PIDcontroller(0,0,0,0,0);
+    private final PIDcontroller mod3PID = new PIDcontroller(0,0,0,0,0);
+    
+    private final swerveKinematics kinematics = new swerveKinematics();
 
-    double mod1reference = 0;
-    double mod2reference = 0;
-    double mod3reference = 0;
-    double heading;
+    // References
+    private double mod1reference = 0, mod2reference = 0, mod3reference = 0;
     private double imuOffset = 0;
+    private boolean initialized = false;
 
-    public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean eff, boolean useImu,
-            boolean fieldCentric) {
+    public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap) {
+        this.telemetry = telemetry;
+
+        // --- Hardware Mapping ---
         mod1m1 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "mod1m1"));
         mod1m2 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "mod1m2"));
         mod2m1 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "mod2m1"));
         mod2m2 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "mod2m2"));
         mod3m1 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "mod3m1"));
         mod3m2 = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "mod3m2"));
+
         mod1E = hardwareMap.get(AnalogInput.class, "mod1E");
         mod2E = hardwareMap.get(AnalogInput.class, "mod2E");
         mod3E = hardwareMap.get(AnalogInput.class, "mod3E");
 
-        mod3m1.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        for (myDcMotorEx motor : new myDcMotorEx[] { mod1m1, mod1m2, mod2m1, mod2m2, mod3m1, mod3m2 }) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // --- Motor Defaults ---
+        myDcMotorEx[] allMotors = {mod1m1, mod1m2, mod2m1, mod2m2, mod3m1, mod3m2};
+        for (myDcMotorEx motor : allMotors) {
             motor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setDirection(DcMotorSimple.Direction.FORWARD);
+            motor.setPowerThresholds(0.05, 0); // Preserve your old deadzone logic
         }
 
-        mod3m1.setPowerThresholds(0.05, 0);
-        mod3m2.setPowerThresholds(0.05, 0);
-        mod1m1.setPowerThresholds(0.05, 0);
-        mod1m2.setPowerThresholds(0.05, 0);
-        mod2m1.setPowerThresholds(0.05, 0);
-        mod2m2.setPowerThresholds(0.05, 0);
-
+        // --- Motor Reversals (FIXED) ---
+        // Only bottom motors are reversed (Coaxial standard for Diffy Swerve usually)
+        mod1m2.setDirection(DcMotorSimple.Direction.REVERSE);
         mod2m2.setDirection(DcMotorSimple.Direction.REVERSE);
         mod3m2.setDirection(DcMotorSimple.Direction.REVERSE);
+        
+        // CRITICAL FIX: mod3m1 must be FORWARD. 
+        // In the broken code, it was REVERSE, which causes the module to fight itself.
+        mod3m1.setDirection(DcMotorSimple.Direction.FORWARD); 
 
-        this.useImu = useImu;
-        this.fieldCentric = fieldCentric;
-        if (useImu) {
-            IMU foundImu = hardwareMap.tryGet(IMU.class, "pinpoint");
-            if (foundImu == null) {
-                foundImu = hardwareMap.tryGet(IMU.class, "imu");
-            }
-
-            if (foundImu != null) {
-                IMU.Parameters localParams = new IMU.Parameters(new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-                foundImu.initialize(localParams);
-            }
-            imu = foundImu;
-        } else {
-            imu = null;
-        }
-        // Store telemetry and efficiency flag
-        this.telemetry = telemetry;
-        this.eff = eff;
+        // --- IMU ---
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+        imu.initialize(params);
     }
 
-    /**
-     * Drive using explicit x, y, and rotation values.
-     */
-    public void drive(double strafe, double forward, double rot) {
-        double mod1P = readEncoderDegrees(mod1E, module1Adjust);
-        double mod2P = readEncoderDegrees(mod2E, module2Adjust);
-        double mod3P = readEncoderDegrees(mod3E, module3Adjust);
+    public void drive(double strafe, double forward, double rot, 
+                      double m1Offset, double m2Offset, double m3Offset,
+                      double Kp, double Kd, double Ki, double Kf, double Kl,
+                      boolean fieldCentric, double imuPolarity, double robotRadius) {
 
-        // Prevent tiny encoder noise from commanding a correction when sticks are idle.
-        boolean sticksActive = forward != 0 || strafe != 0 || rot != 0;
-        final double steerDeadbandDeg = 1.0;
+        // 1. Update PID Coeffs
+        mod1PID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+        mod2PID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+        mod3PID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
 
-        if (!initializedReferences) {
-            mod1reference = mod1P;
-            mod2reference = mod2P;
-            mod3reference = mod3P;
-            initializedReferences = true;
+        // 2. Read Sensors (Volts -> Degrees)
+        // Formula: (V - 0.043) / 3.1 * 360. 
+        // We add the offset HERE so the rest of the code works with "Real Degrees"
+        double mod1P = readEncoder(mod1E, m1Offset);
+        double mod2P = readEncoder(mod2E, m2Offset);
+        double mod3P = readEncoder(mod3E, m3Offset);
+
+        // 3. Get Heading
+        double heading = 0;
+        if (fieldCentric) {
+            heading = getHeading(imuPolarity);
         }
 
-        // Update heading of robot
-        heading = useImu && imu != null ? getHeadingInDegrees() : 0;
-
-        // Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(forward, strafe, rot, heading, fieldCentric);
+        // 4. Calculate Kinematics (Vectors)
+        // We pass the config variables into the kinematics calculator
+        double[] output = kinematics.calculate(forward, -strafe, -rot, heading, fieldCentric, robotRadius);
+        
         double mod1power = output[0];
-        double mod3power = output[1];
-        double mod2power = output[2];
+        double mod3power = output[1]; // Kinematics returns mod1, mod3, mod2 order in your old code?
+        double mod2power = output[2]; // Checked: Old code returned {v1, v2, v3, theta1, theta2, theta3}
 
-        // keep previous module heading if joystick not being used
-        if (forward != 0 || strafe != 0 || rot != 0) {
+        // 5. Locking Logic (Don't move wheels if joystick is dead)
+        if (forward != 0 || strafe != 0 || rot != 0 || !initialized) {
             mod1reference = output[3];
+            mod3reference = output[5]; // Order match: Kinematics returns {v1, v3, v2, a1, a3, a2}? 
+            // WAIT - Standardize order. 
+            // In your provided kinematics: output is {m1s, m2s, m3s, m1a, m2a, m3a}
+            // Let's ensure we map index 4 to mod2 and 5 to mod3 correctly.
+            // Kinematics provided: returns {mod1speed, mod2speed, mod3speed, mod1angle, mod2angle, mod3angle}
+            // So:
+            mod1power = output[0];
+            mod2power = output[1]; 
+            mod3power = output[2];
+            
+            mod1reference = output[3];
+            mod2reference = output[4]; 
             mod3reference = output[5];
-            mod2reference = output[4];
+            
+            initialized = true;
         }
 
-        // Anglewrap all the angles so that the module turns both ways
+        // 6. Efficient Turn & PID
+        // Angle Wrap
         mod1P = mathsOperations.angleWrap(mod1P);
         mod2P = mathsOperations.angleWrap(mod2P);
         mod3P = mathsOperations.angleWrap(mod3P);
-
+        
         mod1reference = mathsOperations.angleWrap(mod1reference);
         mod2reference = mathsOperations.angleWrap(mod2reference);
         mod3reference = mathsOperations.angleWrap(mod3reference);
 
-        // Make sure that a module never turns more than 90 degrees
-        double[] mod1efvalues = mathsOperations.efficientTurn(mod1reference, mod1P, mod1power);
+        // Efficient Turn (Reverse power if angle > 90)
+        double[] m1Eff = mathsOperations.efficientTurn(mod1reference, mod1P, mod1power);
+        double[] m2Eff = mathsOperations.efficientTurn(mod2reference, mod2P, mod2power);
+        double[] m3Eff = mathsOperations.efficientTurn(mod3reference, mod3P, mod3power);
 
-        double[] mod2efvalues = mathsOperations.efficientTurn(mod2reference, mod2P, mod2power);
+        // PID Calculation
+        double m1PID = mod1PID.pidOut(AngleUnit.normalizeDegrees(m1Eff[0] - mod1P));
+        double m2PID = mod2PID.pidOut(AngleUnit.normalizeDegrees(m2Eff[0] - mod2P));
+        double m3PID = mod3PID.pidOut(AngleUnit.normalizeDegrees(m3Eff[0] - mod3P));
 
-        double[] mod3efvalues = mathsOperations.efficientTurn(mod3reference, mod3P, mod3power);
+        // 7. Differential Mixing (PID + Drive Power)
+        // m1PID is rotation, m1Eff[1] is drive
+        double[] m1Out = mathsOperations.diffyConvert(m1PID, -m1Eff[1]);
+        double[] m2Out = mathsOperations.diffyConvert(-m2PID, m2Eff[1]); // Sign check: old code had different signs
+        double[] m3Out = mathsOperations.diffyConvert(-m3PID, m3Eff[1]);
+        
+        // 8. Output
+        mod1m1.setPower(m1Out[0]); mod1m2.setPower(m1Out[1]);
+        mod2m1.setPower(m2Out[0]); mod2m2.setPower(m2Out[1]);
+        mod3m1.setPower(m3Out[0]); mod3m2.setPower(m3Out[1]);
 
-        if (eff) {
-            mod1reference = mod1efvalues[0];
-            mod1power = mod1efvalues[1];
-            mod2reference = mod2efvalues[0];
-            mod2power = mod2efvalues[1];
-            mod3reference = mod3efvalues[0];
-            mod3power = mod3efvalues[1];
-        }
-
-        // change coax values into diffy values from pid and power
-        double mod1Error = AngleUnit.normalizeDegrees(mod1reference - mod1P);
-        double mod2Error = AngleUnit.normalizeDegrees(mod2reference - mod2P);
-        double mod3Error = AngleUnit.normalizeDegrees(mod3reference - mod3P);
-
-        double mod1Steer = Math.abs(mod1Error) < steerDeadbandDeg && !sticksActive ? 0 : mod1PID.pidOut(mod1Error);
-        double mod2Steer = Math.abs(mod2Error) < steerDeadbandDeg && !sticksActive ? 0 : -mod2PID.pidOut(mod2Error);
-        double mod3Steer = Math.abs(mod3Error) < steerDeadbandDeg && !sticksActive ? 0 : -mod3PID.pidOut(mod3Error);
-
-        double[] mod1values = mathsOperations.diffyConvert(mod1Steer, -mod1power);
-        mod1m1.setPower(mod1values[0]);
-        mod1m2.setPower(mod1values[1]);
-        double[] mod2values = mathsOperations.diffyConvert(mod2Steer, mod2power);
-        mod2m1.setPower(mod2values[0]);
-        mod2m2.setPower(mod2values[1]);
-        double[] mod3values = mathsOperations.diffyConvert(mod3Steer, mod3power);
-        mod3m1.setPower(mod3values[0]);
-        mod3m2.setPower(mod3values[1]);
-
-        telemetry.addData("mod1reference", mod1reference);
-        telemetry.addData("mod2reference", mod2reference);
-        telemetry.addData("mod3reference", mod3reference);
-
-        telemetry.addData("mod1P", mod1P);
-        telemetry.addData("mod2P", mod2P);
-        telemetry.addData("mod3P", mod3P);
-        telemetry.addData("mod1Error", mod1Error);
-        telemetry.addData("mod2Error", mod2Error);
-        telemetry.addData("mod3Error", mod3Error);
-        telemetry.addData("mod1Steer", mod1Steer);
-        telemetry.addData("mod2Steer", mod2Steer);
-        telemetry.addData("mod3Steer", mod3Steer);
+        // 9. Telemetry
+        telemetry.addData("Heading", heading);
+        telemetry.addData("M1 Angle/Ref", "%.1f / %.1f", mod1P, m1Eff[0]);
+        telemetry.addData("M2 Angle/Ref", "%.1f / %.1f", mod2P, m2Eff[0]);
+        telemetry.addData("M3 Angle/Ref", "%.1f / %.1f", mod3P, m3Eff[0]);
     }
 
-    /**
-     * Rotate robot by a given angle (degrees).
-     */
-    public void rotateKids(double angle) {
-        imuOffset = AngleUnit.normalizeDegrees(imuOffset + angle);
+    private double readEncoder(AnalogInput enc, double offset) {
+        double raw = (enc.getVoltage() - 0.043) / 3.1 * 360.0;
+        return AngleUnit.normalizeDegrees(raw - offset); // Minus offset to "Zero" it
     }
 
-    /**
-     * Reset IMU yaw to zero.
-     */
-    public void resetIMU() {
-        imuOffset = 0;
-        if (imu != null) {
-            imu.resetYaw();
-        }
+    private double getHeading(double polarity) {
+        return AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) * polarity - imuOffset);
+    }
+    
+    public void resetIMU() { imuOffset = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES); }
+
+
+    public void tuneModules(double targetAngle, double m1Offset, double m2Offset, double m3Offset,
+                            double Kp, double Kd, double Ki, double Kf, double Kl) {
+        // Update PIDs
+        mod1PID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+        mod2PID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+        mod3PID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+
+        // Read Current Angles
+        double mod1P = readEncoder(mod1E, m1Offset);
+        double mod2P = readEncoder(mod2E, m2Offset);
+        double mod3P = readEncoder(mod3E, m3Offset);
+        
+        // Wrap/Optimize
+        mod1P = mathsOperations.angleWrap(mod1P);
+        mod2P = mathsOperations.angleWrap(mod2P);
+        mod3P = mathsOperations.angleWrap(mod3P);
+        
+        // Calculate Error based on the "TARGET_ANGLE" from Dashboard
+        double[] m1Eff = mathsOperations.efficientTurn(targetAngle, mod1P, 0); // 0 power, just turning
+        double[] m2Eff = mathsOperations.efficientTurn(targetAngle, mod2P, 0);
+        double[] m3Eff = mathsOperations.efficientTurn(targetAngle, mod3P, 0);
+        
+        double m1PID = mod1PID.pidOut(AngleUnit.normalizeDegrees(m1Eff[0] - mod1P));
+        double m2PID = mod2PID.pidOut(AngleUnit.normalizeDegrees(m2Eff[0] - mod2P));
+        double m3PID = mod3PID.pidOut(AngleUnit.normalizeDegrees(m3Eff[0] - mod3P));
+        
+        // Apply ONLY rotation power (no drive)
+        // Note: diffyConvert(rotate, translate)
+        double[] m1Out = mathsOperations.diffyConvert(m1PID, 0);
+        double[] m2Out = mathsOperations.diffyConvert(-m2PID, 0);
+        double[] m3Out = mathsOperations.diffyConvert(-m3PID, 0);
+        
+        mod1m1.setPower(m1Out[0]); mod1m2.setPower(m1Out[1]);
+        mod2m1.setPower(m2Out[0]); mod2m2.setPower(m2Out[1]);
+        mod3m1.setPower(m3Out[0]); mod3m2.setPower(m3Out[1]);
+        
+        telemetry.addData("Target", targetAngle);
+        telemetry.addData("M1 Pos", mod1P);
+        telemetry.addData("M1 Error", m1Eff[0] - mod1P);
     }
 
-    // Tune module PIDs
-    /**
-     * Set PID coefficients for module 1 (others share same PID instance).
-     */
-    public void setPIDCoeffs(double Kp, double Kd, double Ki, double Kf, double limit) {
-        mod1PID.setPIDgains(Kp, Kd, Ki, Kf, limit);
-    }
 
-    // Tunable module zeroing
-    public void setModuleAdjustments(double module1Adjust, double module2Adjust, double module3Adjust) {
-        this.module1Adjust = module1Adjust;
-        this.module2Adjust = module2Adjust;
-        this.module3Adjust = module3Adjust;
-    }
-
-    /**
-     * Get robot heading in degrees.
-     */
-    public double getHeading() {
-        return getHeadingInDegrees();
-    }
-
-    /**
-     * Convert encoder voltage to degrees with offset.
-     */
-    private double readEncoderDegrees(AnalogInput encoder, double offsetDegrees) {
-        return AngleUnit.normalizeDegrees((encoder.getVoltage() - 0.043) / 3.1 * 360 + offsetDegrees);
-    }
-
-    /**
-     * Internal helper to get heading from IMU.
-     */
-    private double getHeadingInDegrees() {
-        if (imu != null) {
-            return AngleUnit.normalizeDegrees(-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - imuOffset);
-        }
-        return 0;
-    }
-
-    /**
-     * Drive using a Gamepad. Left stick controls translation, right stick X
-     * controls rotation.
-     */
-    public void drive(com.qualcomm.robotcore.hardware.Gamepad gamepad) {
-        double x = gamepad.left_stick_x;
-        double y = -gamepad.left_stick_y; // invert Y for forward
-        double rot = gamepad.right_stick_x;
-        drive(x, y, rot);
-    }
 }

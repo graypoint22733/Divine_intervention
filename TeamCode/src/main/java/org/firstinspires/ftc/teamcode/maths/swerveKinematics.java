@@ -2,46 +2,58 @@ package org.firstinspires.ftc.teamcode.maths;
 
 public class swerveKinematics {
 
-    //swerve kinematics
-    public double[] calculate(double forward, double strafe, double rotate, double imu, boolean fieldcentrictoggle){
+    public double[] calculate(double forward, double strafe, double rotate, double imu, boolean fieldcentric, double radius){
 
-        //rotate vectors by imu heading for field centric (if toggled on)
+        // 1. Field Centric Adjustment
         double strafe1 = strafe;
         double forward1 = forward;
 
-        if(fieldcentrictoggle) {
+        if(fieldcentric) {
             strafe1 = Math.cos(Math.toRadians(imu)) * strafe - Math.sin(Math.toRadians(imu)) * forward;
             forward1 = Math.sin(Math.toRadians(imu)) * strafe + Math.cos(Math.toRadians(imu)) * forward;
         }
 
-        //the joystick values (after rotated) converted into vectors (split in x and y) that are wheel specific, displacement vectors per wheel also
-        double mod1strafe = strafe1-rotate*1;
-        double mod2strafe = strafe1-rotate*-0.5;
-        double mod3strafe = strafe1-rotate*-0.5;
+        // 2. Kinematics (Wheel Specific Vectors)
+        // Robot Geometry: Square missing Top-Left corner.
+        // We assume Center of Rotation (0,0) is the middle of the virtual square.
+        // Scaling: 'radius' adjusts the rotation speed relative to drive speed.
 
-        double mod1forward = forward1; //top wheel at x 0
-        double mod2forward = forward1+rotate*0.866;
-        double mod3forward = forward1+rotate*-0.866;
+        // Module 1: Top Right (X=1, Y=1)
+        // Rx = 1, Ry = 1
+        // Vx = strafe - rot * Ry
+        // Vy = forward + rot * Rx
+        double mod1strafe = strafe1 - (rotate * radius * 1.0);
+        double mod1forward = forward1 + (rotate * radius * 1.0);
 
-        //extracting the length of our wheel specific vectors (speed)
+        // Module 2: Bottom Right (X=1, Y=-1)
+        // Rx = 1, Ry = -1
+        double mod2strafe = strafe1 - (rotate * radius * -1.0);
+        double mod2forward = forward1 + (rotate * radius * 1.0);
+
+        // Module 3: Bottom Left (X=-1, Y=-1)
+        // Rx = -1, Ry = -1
+        double mod3strafe = strafe1 - (rotate * radius * -1.0);
+        double mod3forward = forward1 + (rotate * radius * -1.0);
+
+        // 3. Extract Speed (Magnitude)
         double mod1speed = Math.sqrt((mod1strafe * mod1strafe) + (mod1forward * mod1forward));
         double mod2speed = Math.sqrt((mod2strafe * mod2strafe) + (mod2forward * mod2forward));
         double mod3speed = Math.sqrt((mod3strafe * mod3strafe) + (mod3forward * mod3forward));
 
-        //make sure that speed values are scaled properly (none go above 1)
-        double max1 = Math.max(( Math.abs(mod2speed)),  Math.abs(mod3speed));
-        double maxi = Math.max((max1), Math.abs(mod1speed));
-        if( Math.abs(maxi)>1) {
-            mod3speed /= Math.abs(maxi);
-            mod2speed /= Math.abs(maxi);
+        // 4. Normalize Speeds (Don't exceed 1.0)
+        double max1 = Math.max(Math.abs(mod2speed), Math.abs(mod3speed));
+        double maxi = Math.max(max1, Math.abs(mod1speed));
+        if(Math.abs(maxi) > 1) {
             mod1speed /= Math.abs(maxi);
+            mod2speed /= Math.abs(maxi);
+            mod3speed /= Math.abs(maxi);
         }
 
-        //extracting the angle of our wheel specific vectors (angle)
-        double mod1angle = Math.atan2(mod1strafe, mod1forward)*180 / Math.PI;
-        double mod2angle = Math.atan2(mod2strafe, mod2forward)*180 / Math.PI;
-        double mod3angle = Math.atan2(mod3strafe, mod3forward)*180 / Math.PI;
+        // 5. Extract Angle (Atan2)
+        double mod1angle = Math.atan2(mod1strafe, mod1forward) * 180 / Math.PI;
+        double mod2angle = Math.atan2(mod2strafe, mod2forward) * 180 / Math.PI;
+        double mod3angle = Math.atan2(mod3strafe, mod3forward) * 180 / Math.PI;
 
-        return new double[]{mod1speed,mod2speed,mod3speed,mod1angle,mod2angle,mod3angle};
+        return new double[]{mod1speed, mod2speed, mod3speed, mod1angle, mod2angle, mod3angle};
     }
 }

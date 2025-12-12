@@ -2,46 +2,61 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.subsystems.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
-import org.firstinspires.ftc.teamcode.subsystems.Turret;
-import org.firstinspires.ftc.teamcode.utility.Encoder;
 
-@TeleOp(name = "SwerveTeleOp", group = "Linear Opmode")
+@TeleOp(name = "Swerve TeleOp (Final)", group = "Main")
 public class SwerveTeleOp extends LinearOpMode {
+
     @Override
     public void runOpMode() {
-        MultipleTelemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        TelemetryReporter telemetryReporter = new TelemetryReporter(telemetry);
+        // Setup Telemetry (Phone + Dashboard)
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        
+        // Init Subsystem
+        SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
 
-        SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap, true, false,
-                false);
-        DriveController driveController = new DriveController(swerve);
-
-        // Turret turret = new Turret(hardwareMap);
-        // Indexer indexer = new Indexer(hardwareMap);
-        // ManipulatorController manipulatorController = new ManipulatorController(turret, indexer);
-
-        // Encoder leftOdo = new Encoder(hardwareMap, "leftOdo");
-        // Encoder rightOdo = new Encoder(hardwareMap, "rightOdo");
-        // LocalizationManager localizationManager = new LocalizationManager(leftOdo, rightOdo, swerve::getHeading);
-
-        telemetryReporter.addInitializationStatus();
+        telemetry.addData("Status", "Ready. Run 'Module Zeroing' if wheels are not aligned.");
+        telemetry.update();
 
         waitForStart();
-        // localizationManager.reset();
 
         while (opModeIsActive()) {
-            DriveController.DriveState driveState = driveController.driveWithGamepad(gamepad1);
-            // ManipulatorController.ManipulatorState manipulatorState = manipulatorController.updateFromGamepad(gamepad2);
-            // Pose2d pose = localizationManager.updateAndGetPose();
-            Pose2d pose = new Pose2d();
+            
+            // 1. Inputs
+            double driveScale = SwerveTeleOpConfig.DRIVE_SPEED_SCALAR;
+            double rotScale = SwerveTeleOpConfig.ROTATION_SPEED_SCALAR;
+            
+            double strafe = gamepad1.left_stick_x * driveScale;
+            double forward = -gamepad1.left_stick_y * driveScale;
+            double rot = gamepad1.right_stick_x * rotScale;
 
-            telemetryReporter.reportLoop(gamepad1, pose, driveState, null);
+            // 2. Drive Command 
+            // We pass ALL config values here so they update live!
+            swerve.drive(
+                strafe, forward, rot,
+                SwerveTeleOpConfig.module1Adjust,
+                SwerveTeleOpConfig.module2Adjust,
+                SwerveTeleOpConfig.module3Adjust,
+                SwerveTeleOpConfig.Kp,
+                SwerveTeleOpConfig.Kd,
+                SwerveTeleOpConfig.Ki,
+                SwerveTeleOpConfig.Kf,
+                SwerveTeleOpConfig.Kl,
+                SwerveTeleOpConfig.FIELD_CENTRIC,
+                SwerveTeleOpConfig.IMU_POLARITY,
+                SwerveTeleOpConfig.ROBOT_RADIUS
+            );
+
+            // 3. Reset IMU
+            if (gamepad1.options || gamepad1.start) {
+                swerve.resetIMU();
+                gamepad1.rumble(500);
+            }
+
+            // 4. Update Telemetry
+            telemetry.update();
         }
     }
 }
