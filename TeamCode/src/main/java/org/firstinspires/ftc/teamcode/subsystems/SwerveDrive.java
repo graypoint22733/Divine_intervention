@@ -57,16 +57,14 @@ public class SwerveDrive {
             motor.setDirection(DcMotorSimple.Direction.FORWARD);
             motor.setPowerThresholds(0.05, 0); // Preserve your old deadzone logic
         }
-
         // --- Motor Reversals (FIXED) ---
         // Only bottom motors are reversed (Coaxial standard for Diffy Swerve usually)
         mod1m2.setDirection(DcMotorSimple.Direction.REVERSE);
-        mod2m2.setDirection(DcMotorSimple.Direction.REVERSE);
+        mod2m2.setDirection(DcMotorSimple.Direction.FORWARD);
         mod3m2.setDirection(DcMotorSimple.Direction.REVERSE);
         
         // CRITICAL FIX: mod3m1 must be FORWARD. 
         // In the broken code, it was REVERSE, which causes the module to fight itself.
-        mod3m1.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // --- IMU ---
         imu = hardwareMap.get(IMU.class, "imu");
@@ -150,8 +148,8 @@ public class SwerveDrive {
         // 7. Differential Mixing (PID + Drive Power)
         // m1PID is rotation, m1Eff[1] is drive
         double[] m1Out = mathsOperations.diffyConvert(m1PID, -m1Eff[1]);
-        double[] m2Out = mathsOperations.diffyConvert(-m2PID, m2Eff[1]); // Sign check: old code had different signs
-        double[] m3Out = mathsOperations.diffyConvert(-m3PID, m3Eff[1]);
+        double[] m2Out = mathsOperations.diffyConvert(m2PID, -m2Eff[1]); // Sign check: old code had different signs
+        double[] m3Out = mathsOperations.diffyConvert(m3PID, -m3Eff[1]);
         
         // 8. Output
         mod1m1.setPower(m1Out[0]); mod1m2.setPower(m1Out[1]);
