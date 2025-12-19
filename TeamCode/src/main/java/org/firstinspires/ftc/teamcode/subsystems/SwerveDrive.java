@@ -105,8 +105,7 @@ public class SwerveDrive {
 
         // 5. Locking Logic (Don't move wheels if joystick is dead)
         if (forward != 0 || strafe != 0 || rot != 0 || !initialized) {
-            mod1reference = output[3];
-            mod3reference = output[5]; // Order match: Kinematics returns {v1, v3, v2, a1, a3, a2}? 
+            // Order match: Kinematics returns {v1, v3, v2, a1, a3, a2}?
             // WAIT - Standardize order. 
             // In your provided kinematics: output is {m1s, m2s, m3s, m1a, m2a, m3a}
             // Let's ensure we map index 4 to mod2 and 5 to mod3 correctly.
@@ -208,7 +207,10 @@ public class SwerveDrive {
         mod1m1.setPower(m1Out[0]); mod1m2.setPower(m1Out[1]);
         mod2m1.setPower(m2Out[0]); mod2m2.setPower(m2Out[1]);
         mod3m1.setPower(m3Out[0]); mod3m2.setPower(m3Out[1]);
-        
+
+
+        /*telemetry or data reported so positions can be seen during testing and
+        encoder functioning confirmed*/
         telemetry.addData("Target", targetAngle);
         telemetry.addData("M1 Pos", mod1P);
         telemetry.addData("M1 Error", m1Eff[0] - mod1P);
