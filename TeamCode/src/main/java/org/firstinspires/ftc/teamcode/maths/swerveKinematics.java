@@ -18,22 +18,23 @@ public class swerveKinematics {
         // We assume Center of Rotation (0,0) is the middle of the virtual square.
         // Scaling: 'radius' adjusts the rotation speed relative to drive speed.
 
-        // Module 1: Top Right (X=1, Y=1)
-        // Rx = 1, Ry = 1
         // Vx = strafe - rot * Ry
         // Vy = forward + rot * Rx
-        double mod1strafe = strafe1 - (rotate * radius * 1.0);
+
+        // Module 1: Bottom Right (X=1, Y=-1)
+        // Rx = 1, Ry = -1
+        double mod1strafe = strafe1 - (rotate * radius * -1.0);
         double mod1forward = forward1 + (rotate * radius * 1.0);
 
-        // Module 2: Bottom Right (X=1, Y=-1)
-        // Rx = 1, Ry = -1
-        double mod2strafe = strafe1 - (rotate * radius * -1.0);
-        double mod2forward = forward1 + (rotate * radius * 1.0);
-
-        // Module 3: Bottom Left (X=-1, Y=-1)
+        // Module 2: Bottom Left (X=-1, Y=-1)
         // Rx = -1, Ry = -1
-        double mod3strafe = strafe1 - (rotate * radius * -1.0);
-        double mod3forward = forward1 + (rotate * radius * -1.0);
+        double mod2strafe = strafe1 - (rotate * radius * -1.0);
+        double mod2forward = forward1 + (rotate * radius * -1.0);
+
+        // Module 3: Top Right (X=1, Y=1)
+        // Rx = 1, Ry = 1
+        double mod3strafe = strafe1 - (rotate * radius * 1.0);
+        double mod3forward = forward1 + (rotate * radius * 1.0);
 
         // 3. Extract Speed (Magnitude)
         double mod1speed = Math.sqrt((mod1strafe * mod1strafe) + (mod1forward * mod1forward));

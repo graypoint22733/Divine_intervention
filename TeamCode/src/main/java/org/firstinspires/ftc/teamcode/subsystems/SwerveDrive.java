@@ -144,9 +144,9 @@ public class SwerveDrive {
 
         // 7. Differential Mixing (PID + Drive Power)
         // m1PID is rotation, m1Eff[1] is drive
-        double[] m1Out = mathsOperations.diffyConvert(m1PID, -m1Eff[1]);
+        double[] m1Out = mathsOperations.diffyConvert(-m1PID, m1Eff[1]);
         double[] m2Out = mathsOperations.diffyConvert(m2PID, -m2Eff[1]); // Sign check: old code had different signs
-        double[] m3Out = mathsOperations.diffyConvert(m3PID, -m3Eff[1]);
+        double[] m3Out = mathsOperations.diffyConvert(-m3PID, m3Eff[1]);
         
         // 8. Output
         mod1m1.setPower(m1Out[0]); mod1m2.setPower(m1Out[1]);
