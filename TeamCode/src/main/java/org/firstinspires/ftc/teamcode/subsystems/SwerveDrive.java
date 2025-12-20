@@ -57,7 +57,7 @@ public class SwerveDrive {
             motor.setDirection(DcMotorSimple.Direction.FORWARD);
             motor.setPowerThresholds(0.05, 0); // Preserve your old deadzone logic
         }
-        // --- Motor Reversals (FIXED) ---
+        // --- Motor Reversals (mod3 still wont work) ---
         // Only bottom motors are reversed (Coaxial standard for Diffy Swerve usually)
         mod1m2.setDirection(DcMotorSimple.Direction.REVERSE);
         mod2m2.setDirection(DcMotorSimple.Direction.FORWARD);
