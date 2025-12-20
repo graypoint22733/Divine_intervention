@@ -23,8 +23,8 @@ public class swerveKinematics {
 
         // Module 1: Bottom Right (X=1, Y=-1)
         // Rx = 1, Ry = -1
-        double mod1strafe = strafe1 - (rotate * radius * -1.0);
-        double mod1forward = forward1 + (rotate * radius * 1.0);
+        double mod1strafe = strafe1 - (rotate * radius * 1.0);
+        double mod1forward = forward1 + (rotate * radius * -1.0);
 
         // Module 2: Bottom Left (X=-1, Y=-1)
         // Rx = -1, Ry = -1
