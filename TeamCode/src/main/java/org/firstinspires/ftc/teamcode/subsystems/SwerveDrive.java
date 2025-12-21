@@ -59,7 +59,7 @@ public class SwerveDrive {
         }
         // --- Motor Reversals (mod3 still wont work) ---
         // Only bottom motors are reversed (Coaxial standard for Diffy Swerve usually)
-        mod1m2.setDirection(DcMotorSimple.Direction.REVERSE);
+        mod1m2.setDirection(DcMotorSimple.Direction.FORWARD);
         mod2m2.setDirection(DcMotorSimple.Direction.FORWARD);
         mod3m2.setDirection(DcMotorSimple.Direction.FORWARD);
         
@@ -145,7 +145,7 @@ public class SwerveDrive {
         // 7. Differential Mixing (PID + Drive Power)
         // m1PID is rotation, m1Eff[1] is drive
         double[] m1Out = mathsOperations.diffyConvert(-m1PID, m1Eff[1]);
-        double[] m2Out = mathsOperations.diffyConvert(m2PID, -m2Eff[1]); // Sign check: old code had different signs
+        double[] m2Out = mathsOperations.diffyConvert(-m2PID, m2Eff[1]); // Sign check: old code had different signs
         double[] m3Out = mathsOperations.diffyConvert(-m3PID, m3Eff[1]);
         
         // 8. Output
