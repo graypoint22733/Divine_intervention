@@ -13,7 +13,6 @@ public class Turret {
 
     public Turret(HardwareMap hardwareMap) {
         // this.flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
-        // this.yawMotor = hardwareMap.get(DcMotorEx.class, "turretYaw");
 
         // flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         // yawMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);

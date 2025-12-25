@@ -4,6 +4,9 @@ public class swerveKinematics {
 
     public double[] calculate(double forward, double strafe, double rotate, double imu, boolean fieldcentric, double radius){
 
+        fieldcentric = true;
+
+
         // 1. Field Centric Adjustment
         double strafe1 = strafe;
         double forward1 = forward;
