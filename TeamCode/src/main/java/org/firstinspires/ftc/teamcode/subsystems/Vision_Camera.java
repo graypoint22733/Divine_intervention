@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,7 +17,6 @@ public class Vision_Camera {
     private final CRServo ServoR;
 
 
-    private final VisionPortal visionPortal;
     private final AprilTagProcessor aprilTag;
 
     private boolean trackingEnabled = false;
@@ -39,7 +37,7 @@ public class Vision_Camera {
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
         // Vision portal
-        visionPortal = VisionPortal.easyCreateWithDefaults(
+        VisionPortal visionPortal = VisionPortal.easyCreateWithDefaults(
                 hardwareMap.get(WebcamName.class, "Webcam 1"),
                 aprilTag
         );
