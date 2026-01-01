@@ -19,11 +19,19 @@ public class SwerveTeleOp extends LinearOpMode {
         // Init Subsystems
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
         Shooter shoot = new Shooter(hardwareMap);
+        // Shooting Status
+        boolean shooting = false;
+
+
 
         telemetry.addData("Status", "Ready. Run 'Module Zeroing' if wheels are not aligned.");
         telemetry.update();
 
         waitForStart();
+
+
+
+
 
         while (opModeIsActive()) {
             
@@ -59,7 +67,6 @@ public class SwerveTeleOp extends LinearOpMode {
             }
 
             //shooter
-             boolean shooting = false;
 
 
             if (gamepad1.a && !shooting) {
