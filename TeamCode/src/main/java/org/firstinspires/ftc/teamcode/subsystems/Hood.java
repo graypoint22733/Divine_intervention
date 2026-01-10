@@ -1,0 +1,63 @@
+package org.firstinspires.ftc.teamcode.subsystems;
+ 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+ 
+import org.firstinspires.ftc.teamcode.util.templates.Feature;
+import org.firstinspires.ftc.teamcode.util.Utils;
+ 
+import java.util.ArrayList;
+ 
+public class Hood extends Feature {
+ 
+    private Servo servo;
+    private boolean needsUpdate = false;
+    private double pos = 0;
+
+    private static final double SERVOMIN = 0, SERVOMAX = 0.5;
+    private static final double ANGLEMIN = 30, ANGLEMAX = 60;
+    private static final double SERVO_TO_ANGLE = 10;
+ 
+    public Hood (HardwareMap map) {
+        super(new ArrayList<>());
+ 
+        servo = map.get(Servo.class, "intake");
+    }
+ 
+    @Override
+    public void update() {
+        if (needsUpdate) {
+            motor.setPower(pos);
+            needsUpdate = false;
+        }
+    }
+
+    public void setPosition(double target){
+        pos = Utils.minMaxClip(target, SERVOMIN, SERVOMAX);
+        needsUpdate = true;
+    }
+ 
+    public void setAngle(double target) {
+        pos = angleToServo(target);
+        needsUpdate = true;
+    }
+
+    public double angleToServo(double angle) {
+        return Utils.minMaxClip((angle - ANGLEMIN) / SERVO_TO_ANGLE + SERVOMIN, SERVOMIN, SERVOMAX);
+    }
+
+    public double servoToAngle(double position) {
+        return Utils.minMaxClip((position - SERVOMIN) * SERVO_TO_ANGLE + ANGLEMIN, ANGLEMIN, ANGLEMAX);
+    }
+
+    public double getAngle(){
+        return servoToAngle(pos);
+    }
+ 
+    @Override
+    public String toString() {
+        return "Hood{" +
+                ", pos=" + pos +
+                '}';
+    }
+}
