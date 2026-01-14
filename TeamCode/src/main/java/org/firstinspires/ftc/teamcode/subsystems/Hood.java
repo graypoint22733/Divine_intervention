@@ -21,7 +21,7 @@ public class Hood extends Feature {
     public Hood (HardwareMap map) {
         super(new ArrayList<>());
  
-        servo = map.get(Servo.class, "intake");
+        servo = map.get(Servo.class, "hood");
     }
  
     @Override
