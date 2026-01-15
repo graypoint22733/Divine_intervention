@@ -4,42 +4,49 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.util.PIDF;
+
 public class Turret {
-    /*boolean autoTarget = false;
+    public static final double GEAR_RATIO = 80/30*37/112, SERVO_TO_ANGLE = 300;
 
-    private final Servo lAxon;
-    private final Servo rAxon;
+    private Servo LServo;
+    private Servo RServo;
 
-    public aimbot(HardwareMap hardwareMap)
-    {
-        lAxon = hardwareMap.get(Servo.class, "lAxon");
-        rAxon = hardwareMap.get(Servo.class, "rAxon");
+    public double target;
+    private boolean tracking = false;
 
+    public Turret (HardwareMap map) {
+        LServo = map.get(Servo.class, "TurretServoL");
+        RServo = map.get(Servo.class, "TurretServoR");
     }
 
-    public void enableAimBot() {
-        autoTarget = true;
+    public void update(){
+        if (tracking) {
+
+        }
     }
 
-    public void disableAimBot() {
-        autoTarget = false;
-        lAxon.setPosition(0);
-        rAxon.setPosition(0);
+    private void setPos(double pos){
+        LServo.setPosition(pos);
+        RServo.setPosition(pos);
     }
 
-    public boolean isAimBot() {
-        return autoTarget;
+    public double getPosition(){
+        return LServo.getPosition();
     }
 
+    public double getAngle(){
+        return LServo.getPosition() * SERVO_TO_ANGLE;
+    }
 
-    if(autoTarget)
-    {
-        x = follower.getPose().getX();
-        y = follower.getPose().getY();
-        angleToRot = (imu.getRobotYawPitchRollAngles().getYaw()) - Math.toDegrees(Math.atan((138-y)/(138-x)));
-        laxonPos = .4889 + (.2705/90)*angleToRot;
-        raxonPos = .4889 + (.2705/90)*angleToRot;
+    public void setAngle(double angle){
+        setPos(angle / SERVO_TO_ANGLE);
+    }
 
-     }*/
+    public void setPosition(double pos){
+        setPos(pos);
+    }
 
+    public void startTracking(){tracking = true;}
+    public void stopTracking(){tracking = false;}
 }

@@ -119,13 +119,7 @@ public class Spindexer {
     }
 
     private void moveEmptySlot(){
-        double targetAdd = 0;
-        target += switch(stored.indexOf("E")) {
-            case 0 -> 120;
-            case 2 -> 240;
-            default -> 0;
-        };
-        target += targetAdd;
+        target += stored.indexOf("E") % 2 == 0 ? (stored.indexOf("E") + 2) * 120 : 0;
     }
 
     private void setPower(double pow){
