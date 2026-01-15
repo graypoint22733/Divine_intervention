@@ -4,13 +4,16 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.util.Pose2d;
 import org.firstinspires.ftc.teamcode.util.PIDF;
+import org.firstinspires.ftc.teamcode.util.drivers.GoBildaPinpointDriver;
 
 public class Turret {
     public static final double GEAR_RATIO = 80/30*37/112, SERVO_TO_ANGLE = 300;
+    public double GOAL_X, GOAL_Y;
 
-    private Servo LServo;
-    private Servo RServo;
+    private Servo LServo, RServo;
+    private GoBildaPinpointDriver odo;
 
     public double target;
     private boolean tracking = false;
@@ -22,8 +25,25 @@ public class Turret {
 
     public void update(){
         if (tracking) {
+            Pose2D pose = odo.getPosition();
 
+            double currentX = pose.getX();
+            double currentY = pose.getY();
+            double currentH = pose.getHeading(); // assumed 0 is facing goal side
+
+            double angleToGoal = Math.atan2(GOAL_Y - currentY, GOAL_X - currentX);
+
+            setPos((angleToGoal - currentH) / SERVO_TO_ANGLE + 0.5);
         }
+    }
+
+    public void setOdo(GoBildaPinpointDriver odometry) {
+        odo = odometry;
+    }
+
+    public void setGoalPositions(double x, double y){
+        GOAL_X = x;
+        GOAL_Y = y;
     }
 
     private void setPos(double pos){

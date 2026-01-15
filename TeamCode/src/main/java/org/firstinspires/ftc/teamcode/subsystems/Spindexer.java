@@ -136,7 +136,7 @@ public class Spindexer {
     }
 
     private String detectColor(REVColorSensorV3 sensor) {
-        int[] color = sensor.readLSRGB();
+        float[] color = sensor.readLSRGB();
 
         if (color[1] > color[0] && color[1] > color[0] && color[1] > 100) {return "G";}
         if (color[2] > 70 && color[0] > 70 && color[1] < 70) {return "P";}
