@@ -49,6 +49,7 @@ public class Turret {
     private void setPos(double pos){
         LServo.setPosition(pos);
         RServo.setPosition(pos);
+        target = pos;
     }
 
     public double getPosition(){
@@ -65,6 +66,10 @@ public class Turret {
 
     public void setPosition(double pos){
         setPos(pos);
+    }
+
+    public void inPosition(){
+        return Math.abs(LServo.getPosition() - target) < 0.02;
     }
 
     // public void startTracking(){tracking = true;}

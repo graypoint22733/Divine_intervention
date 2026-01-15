@@ -1,37 +1,103 @@
 package org.firstinspires.ftc.teamcode.subsystems;
-
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+ 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
-import org.firstinspires.ftc.teamcode.utility.myDcMotorEx;
+ 
+import org.firstinspires.ftc.teamcode.util.statemachine.State;
+import org.firstinspires.ftc.teamcode.util.statemachine.StateMachine;
+import org.firstinspires.ftc.teamcode.util.Pose2d;
+import org.firstinspires.ftc.teamcode.util.statemachine.Transition;
+ 
+import java.util.ArrayList;
 
 public class Shooter {
+    private StateMachine state;
+ 
+    private Flywheel flywheel;
+    private Hood hood;
+    private Turret turret;
+    private Pose2d pose, goal;
 
-    private final myDcMotorEx ShooterMotor;
+    public final static double IDLE_VEL = 4000, IDLE_HOOD = 0.5;
 
-    private final PIDcontroller ShooterPID = new PIDcontroller(0, 0, 0, 0, 0);
-
-    final double ticks_per_rev = 28;
-    double target_rpm = 6000;
-    double penetration = 0;
-    double angle = 0;
-
-
-    public Shooter(HardwareMap hardwareMap) {
-        ShooterMotor = new myDcMotorEx(hardwareMap.get(DcMotorEx.class, "SM"));
-        ShooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        ShooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        ShooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    private boolean requestShot;
+ 
+    public Shooter (HardwareMap map) {
+        flywheel = new Flywheel(map);
+        hood = new Hood(map);
+        turret = new Turret(map);
+ 
+        requestShot = false;
+        pose = new Pose2d(0, 0, Math.toRadians(0));
+        goal = new Pose2d(0, 0, Math.toRadians(0));
+  
+        State[] states = createStates();
+        state = new StateMachine(states);
     }
 
-    public void shoot(boolean shooting) {
-        if (shooting) {
-            ShooterMotor.setVelocity(target_rpm / ticks_per_rev);
-        } else ShooterMotor.setPower(0);
-}
+    private State[] createStates() {
+        State[] states = new State[2];
+ 
+        states[0] = new State("IDLE")
+                .setDuring(() -> {
+                    flywheel.setVelocity(IDLE_VEL);
+                    hood.setPosition(IDLE_HOOD);
+                })
+                .addTransition(new Transition(() -> requestShot, "ON"));
+ 
+        states[1] = new State("ON")
+                .setDuring(() -> {
+                    double dx = goal.getErrorInX(pose);
+                    double dy = goal.getErrorInY(pose);
+ 
+                    double tAngle = Math.toDegrees(Math.atan2(dy, dx));
+                    double offset = tAngle - Math.toDegrees(pose.getHeading());
+ 
+                    turret.setTargetAngle(offset + turret.SERVO_TO_ANGLE / 2);
 
+                    flywheel.setVelocity(5000);
+                    hood.setPosition(getHoodFromFlywheel(flywheel.getCurrentVel()));
+                })
+                .setFallbackState("IDLE")
+                .addTransition(new Transition(() -> !requestShot, "IDLE"));
+ 
+        return states;
+    }
+
+    public void init() {
+        state.start();
+        flywheel.setVelocity(IDLE_VEL);
+        hood.setPosition(IDLE_HOOD);
+        turret.setAngle(turret.getAngle());
+    }
+ 
+    public void update() {
+        flywheel.update();
+        state.run();
+    }
+
+    public void updatePose(Pose2d pose) {
+        this.pose = pose;
+    }
+
+    public void updateGoal(Pose2D goal) {
+        this.goal = goal;
+    }
+
+    private double getHoodFromFlywheel(double velocity) {
+        return 1 - (velocity / 10000);
+    }
+
+    public boolean isReady() {
+        if (!state.currentState().equals("ON")) return false;
+ 
+        return flywheel.atVelocity() && hood.atPosition() && turret.inPosition();
+    }
+
+    public void requestShot() {
+        requestShot = true;
+    }
+ 
+    public void requestIdle() {
+        requestShot = false;
+    }
 }

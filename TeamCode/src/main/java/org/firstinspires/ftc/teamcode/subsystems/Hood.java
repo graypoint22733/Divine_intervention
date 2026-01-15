@@ -23,23 +23,14 @@ public class Hood extends Feature {
  
         servo = map.get(Servo.class, "hood");
     }
- 
-    @Override
-    public void update() {
-        if (needsUpdate) {
-            motor.setPower(pos);
-            needsUpdate = false;
-        }
-    }
 
     public void setPosition(double target){
         pos = Utils.minMaxClip(target, SERVOMIN, SERVOMAX);
-        needsUpdate = true;
+        servo.setPosition(pos);
     }
  
     public void setAngle(double target) {
-        pos = angleToServo(target);
-        needsUpdate = true;
+        setPosition(angleToServo(target));
     }
 
     public double angleToServo(double angle) {
@@ -53,11 +44,16 @@ public class Hood extends Feature {
     public double getAngle(){
         return servoToAngle(pos);
     }
+
+    public double atPosition(){
+        return Math.abs(servo.getPosition() - pos) < 0.03;
+    }
  
     @Override
     public String toString() {
         return "Hood{" +
-                ", pos=" + pos +
+                ", targetpos=" + pos +
+                ", servopos=" + servo.getPosition() +
                 '}';
     }
 }
