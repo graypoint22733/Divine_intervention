@@ -39,6 +39,10 @@ public class MechTeleOp extends LinearOpMode{
                 robot.requestShot();
             }
 
+            if (gamepad1.dpad_up){
+                robot.requestIdle();
+            }
+
             telemetry.addData("Status", robot.toString());
             telemetry.update();
         }

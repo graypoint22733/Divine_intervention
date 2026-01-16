@@ -19,8 +19,6 @@ public class Hood extends Feature {
     private static final double SERVO_TO_ANGLE = 10;
  
     public Hood (HardwareMap map) {
-        super(new ArrayList<>());
- 
         servo = map.get(Servo.class, "hood");
     }
 

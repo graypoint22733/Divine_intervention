@@ -20,9 +20,7 @@ public class Flywheel extends Feature {
     private PIDF velPID = new PIDF(P,D, () -> (targetVel.get() * kV));
     private double currentVel, pow;
  
-    public Flywheel (HardwareMap map) {
-        super(new ArrayList<>());
- 
+    public Flywheel (HardwareMap map) { 
         motor = map.get(DcMotorEx.class, "shooter");
  
         voltage = map.get(VoltageSensor.class, "Control Hub");

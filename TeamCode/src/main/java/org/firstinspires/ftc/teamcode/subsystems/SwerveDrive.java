@@ -235,4 +235,8 @@ public class SwerveDrive {
         telemetry.addData("M2 Pos", mod2P);
         telemetry.addData("M3 Pos", mod3P);
     }
+
+    public void updateTelemetry(Telemetry telem){
+        telemetry = telem;
+    }
 }

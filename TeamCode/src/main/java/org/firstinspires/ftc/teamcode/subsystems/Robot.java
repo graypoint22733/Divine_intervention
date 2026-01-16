@@ -39,7 +39,7 @@ public class Robot {
     }
 
     private State[] createStates(){
-        State[] states = new State(5);
+        State[] states = new State[5];
 
         states[0] = new State("IDLE")
                 .setEntry(() -> {
@@ -77,6 +77,7 @@ public class Robot {
         states[3] = new State("SORT")
                 .setEntry(() -> {
                     requestSort = false;
+                    spindex.enableSort();
                 })
                 .setFallbackState("IDLE")
                 .addTransition(new Transition(() -> requestIdle, "IDLE"))
@@ -91,7 +92,7 @@ public class Robot {
                     spindex.shoot();
                 })
                 .setDuring(() -> {
-                    shooter.updatePose(pos);
+                    shooter.updatePose(pose);
                 })
                 .setExit(() -> {
                     shooter.requestIdle();
@@ -99,6 +100,8 @@ public class Robot {
                 .setFallbackState("IDLE")
                 .addTransition(new Transition(() -> spindex.isEmpty(), "IDLE"))
                 .addTransition(new Transition(() -> requestIdle, "IDLE"));
+    
+        return states;
     }
 
     public void init(){
@@ -124,8 +127,11 @@ public class Robot {
 
     public void updateTelemetry(Telemetry telem) {
         telemetry = telem;
-        swerve.telemetry = telem;
+        swerve.updateTelemetry(telem);
     }
+
+    public void enableSort(){spindex.enableSort();}
+    public void disableSort(){spindex.disableSort();}
 
     public void requestIdle(){requestIdle = true;}
     public void requestIntake(){requestIntake = true;}

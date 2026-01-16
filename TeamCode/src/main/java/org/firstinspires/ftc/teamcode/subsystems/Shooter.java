@@ -79,7 +79,7 @@ public class Shooter {
         pose = pos;
     }
 
-    public void updateGoal(Pose2D goale) {
+    public void updateGoal(Pose2d goale) {
         goal = goale;
     }
 
