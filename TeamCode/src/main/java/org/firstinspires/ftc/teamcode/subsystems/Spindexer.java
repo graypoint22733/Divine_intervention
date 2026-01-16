@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 
-import org.firstinspires.ftc.teamcode.util.drivers.REVColorSensorV3;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import org.firstinspires.ftc.teamcode.util.PIDF;
 import org.firstinspires.ftc.teamcode.util.wrappers.Sensorange;
 import org.firstinspires.ftc.teamcode.util.statemachine.State;
@@ -15,9 +15,9 @@ public class Spindexer {
     private CRServo LServo;
     private CRServo RServo;
 
-    private REVColorSensorV3 colora;
-    private REVColorSensorV3 colorb;
-    private REVColorSensorV3 colorc;
+    private ColorSensor colora;
+    private ColorSensor colorb;
+    private ColorSensor colorc;
     private Sensorange encoder;
 
     private StateMachine state;
@@ -37,9 +37,9 @@ public class Spindexer {
 
         encoder = new Sensorange("encoder", map);
 
-        colora = map.get(REVColorSensorV3.class, "color1");
-        colorb = map.get(REVColorSensorV3.class, "color2");
-        colorc = map.get(REVColorSensorV3.class, "color3");
+        colora = map.get(ColorSensor.class, "color1");
+        colorb = map.get(ColorSensor.class, "color2");
+        colorc = map.get(ColorSensor.class, "color3");
 
         pid.setTolerance(3);
 
@@ -141,11 +141,12 @@ public class Spindexer {
         return stored;
     }
 
-    private String detectColor(REVColorSensorV3 sensor) {
-        float[] color = sensor.readLSRGB();
-
-        if (color[1] > color[0] && color[1] > color[0] && color[1] > 100) {return "G";}
-        if (color[2] > 70 && color[0] > 70 && color[1] < 70) {return "P";}
+    private String detectColor(ColorSensor sensor) {
+        int r = sensor.red();
+        int g = sensor.green();
+        int b = sensor.blue();
+        if (g > r && g > b && g > 100) {return "G";}
+        if (b > 70 && r > 70 && g < 70) {return "P";}
         return "E";
     }
 
@@ -171,13 +172,10 @@ public class Spindexer {
 
     @Override
     public String toString(){
-        float[] ca = colora.readLSRGB();
-        float[] cb = colorb.readLSRGB();
-        float[] cc = colorc.readLSRGB();
         return "Spindexer {" +
-                "sensorA =" + ca[0] + " " + ca[1] + " " + ca[2] + stored.get(0) +
-                "sensorB =" + cb[0] + " " + cb[1] + " " + cb[2] + stored.get(1) +
-                "sensorC =" + cc[0] + " " + cc[1] + " " + cc[2] + stored.get(2)
+                "sensorA =" + colora.red() + " " + colora.green() + " " + colora.blue() + stored.get(0) +
+                "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) +
+                "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2)
                 + "}";
     }
 }
