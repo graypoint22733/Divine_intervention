@@ -37,6 +37,10 @@ public class Spindexer {
 
         encoder = new Sensorange("encoder", map);
 
+        colora = map.get(REVColorSensorV3.class, "color1");
+        colorb = map.get(REVColorSensorV3.class, "color2");
+        colorc = map.get(REVColorSensorV3.class, "color3");
+
         pid.setTolerance(3);
 
         scanDexer();
