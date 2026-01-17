@@ -107,9 +107,12 @@ public class Robot {
 
     public void init(){
         state.start();
+        shooter.init();
     }
 
     public void update(){
+        state.run();
+
         shooter.update();
         spindex.update();
         odo.update();

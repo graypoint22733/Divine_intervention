@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 @TeleOp(name="Mech Teleop", group="Human Teleop")
 public class MechTeleOp extends LinearOpMode{
     Robot robot;
-    Pose2d goal;
+    Pose2d goal = new Pose2d(0, 0);
 
     @Override
     public void runOpMode(){
