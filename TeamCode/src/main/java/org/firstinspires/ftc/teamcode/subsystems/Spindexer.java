@@ -172,7 +172,7 @@ public class Spindexer {
 
     public void pleasekillmeiwannadie(){setPower(1);}
     public void youbetterflymeouttoworlds(){setPower(-1);}
-    public void iamsacrificingmyfutureforthis(){setPower(-1);}
+    public void iamsacrificingmyfutureforthis(){setPower(0);}
 
     @Override
     public String toString(){
