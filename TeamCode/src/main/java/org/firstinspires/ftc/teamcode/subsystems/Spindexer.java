@@ -171,8 +171,8 @@ public class Spindexer {
     public void enableSort(){sort = true;}
     public void disableSort(){sort = false;}
 
-    public void pleasekillmeiwannadie(){setPower(1);}
-    public void youbetterflymeouttoworlds(){setPower(-1);}
+    public void pleasekillmeiwannadie(){setPower(0.5);}
+    public void youbetterflymeouttoworlds(){setPower(-0.5);}
     public void iamsacrificingmyfutureforthis(){setPower(0);}
 
     @Override
