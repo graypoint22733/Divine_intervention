@@ -157,9 +157,9 @@ public class Robot {
         requestShot = true;
     }
 
-    public void pleasekillmeiwannadie(){intake.pleasekillmeiwannadie();}
-    public void youbetterflymeouttoworlds(){intake.youbetterflymeouttoworlds();}
-    public void iamsacrificingmyfutureforthis(){intake.iamsacrificingmyfutureforthis();}
+    public void pleasekillmeiwannadie(){spindex.pleasekillmeiwannadie();}
+    public void youbetterflymeouttoworlds(){spindex.youbetterflymeouttoworlds();}
+    public void iamsacrificingmyfutureforthis(){spindex.iamsacrificingmyfutureforthis();}
 
     @Override
     public String toString(){
