@@ -62,9 +62,9 @@ public class Pose2d implements Cloneable {
         return angle;
     }
 
-    public Pose2d convertPose2D(Pose2D pose){
-        return new Pose2d(pose.getX(), pose.getY(), pose.getHeading());
-    }
+    // public Pose2d convertPose2D(Pose2D pose){
+    //     return new Pose2d(pose.getX(), pose.getY(), pose.getHeading());
+    // }
 
     @NonNull
     @Override

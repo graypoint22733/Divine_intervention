@@ -10,11 +10,11 @@ public class AutoBuilder {
     // position constants go here
     private Robot robot;
 
-    public AutoBuilder(hardwareMap map){
+    public AutoBuilder(HardwareMap map){
         robot = new Robot(map);
     }
 
-    public init(Pose2d goal, Telemetry telemetry) {
+    public void init(Pose2d goal, Telemetry telemetry) {
         robot.init();
         robot.updateGoal(goal);
         robot.updateTelemetry(telemetry);

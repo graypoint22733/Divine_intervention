@@ -127,7 +127,7 @@ public class Robot {
         intake.update();
         odo.update();
 
-        pose = pose.convertPose2D(odo.getPosition());
+        pose = odo.getPosition();
     }
 
     public void drive(double strafe, double forward, double rot){
