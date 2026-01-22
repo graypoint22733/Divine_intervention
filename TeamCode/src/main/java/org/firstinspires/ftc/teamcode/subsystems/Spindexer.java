@@ -21,8 +21,9 @@ public class Spindexer {
     private Sensorange encoder;
 
     private StateMachine state;
-    public static double P = 0.002, D = 0.0001;
+    public static double P = 0.003, D = 0.0005;
     private PIDF pid = new PIDF(P, D);
+    private double maxServoSpeed = 0.3;
     private double target = -44;
 
     private ArrayList<String> motif = new ArrayList<>();
@@ -31,7 +32,6 @@ public class Spindexer {
     private boolean sort = false;
     private boolean sorted = false;
     private String status = "NO, THE THING IS NOT RUNNING";
-    private double maxServoSpeed = 0.1;
 
     public Spindexer(HardwareMap map){
         LServo = map.get(CRServo.class, "IndexServoL");
@@ -165,7 +165,8 @@ public class Spindexer {
     }
 
     public boolean isEmpty(){
-        return stored.indexOf("P") == -1 && stored.indexOf("G") == -1;
+        return pid.atSetPoint();
+        //return stored.indexOf("P") == -1 && stored.indexOf("G") == -1;
     }
 
     public boolean isIdle(){
