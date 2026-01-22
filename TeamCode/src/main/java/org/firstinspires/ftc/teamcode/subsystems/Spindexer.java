@@ -22,9 +22,9 @@ public class Spindexer {
     private Sensorange encoder;
 
     private StateMachine state;
-    public static double P = 0.002, D = 0.0001;
+    public static double P = 0.0008, D = 0.0001;
     private PIDF pid = new PIDF(P, D);
-    private double target = -284;
+    private double target = -44;
 
     private ArrayList<String> motif = new ArrayList<>();
     private ArrayList<String> stored = new ArrayList<>();
