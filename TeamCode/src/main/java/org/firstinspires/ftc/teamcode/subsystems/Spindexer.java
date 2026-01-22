@@ -22,7 +22,7 @@ public class Spindexer {
     private Sensorange encoder;
 
     private StateMachine state;
-    public static double P = 0.05, D = 0.001;
+    public static double P = 0.005, D = 0.001;
     private PIDF pid = new PIDF(P, D);
     private double target = -44;
 
