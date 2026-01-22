@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.util.PIDF;
 import org.firstinspires.ftc.teamcode.util.wrappers.Sensorange;
 import org.firstinspires.ftc.teamcode.util.statemachine.State;
 import org.firstinspires.ftc.teamcode.util.statemachine.StateMachine;
+import org.firstinspires.ftc.teamcode.util.Utils;
 
 public class Spindexer {
     private CRServo LServo;
@@ -130,6 +131,7 @@ public class Spindexer {
     }
 
     private void setPower(double pow){
+        pow = Utils.minMaxClip(pow, -1, 1);
         LServo.setPower(pow);
         RServo.setPower(pow);
     }
