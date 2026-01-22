@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Sensorange{
 
     private AnalogInput encoder;
-    private double lastCheckedPosition, fullRotations;
-    private Double currentAbsoluteAngle;
+    private double lastCheckedPosition = 0, fullRotations = 0;
+    private double currentAbsoluteAngle = 0;
 
 
     public Sensorange (String name, HardwareMap map) {
@@ -30,9 +30,7 @@ public class Sensorange{
             fullRotations--;
         }
 
-        if (currentAbsoluteAngle != null) {
-            currentAbsoluteAngle = encoderResult + fullRotations * 360;
-        }
+        currentAbsoluteAngle = encoderResult + fullRotations * 360;
 
         lastCheckedPosition = encoderResult;
     }
