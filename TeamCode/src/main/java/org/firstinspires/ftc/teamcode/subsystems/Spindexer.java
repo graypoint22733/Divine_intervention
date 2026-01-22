@@ -29,6 +29,7 @@ public class Spindexer {
     private ArrayList<String> stored = new ArrayList<>();
     private boolean requestFire, requestSort, requestIdle = false;
     private boolean sort = false;
+    private boolean sorted = false;
     private String status = "NO, THE THING IS NOT RUNNING";
     private double maxServoSpeed = 0.1;
 
@@ -93,7 +94,7 @@ public class Spindexer {
         encoder.calculateValue();
         if (!runPID()){
             scanDexer();
-            if (sort) {
+            if (sort && !sorted) {
                 int p = 0, g = 0;
                 for (String s : stored) {
                     p += s.equals("P") ? 1 : 0;
@@ -109,6 +110,7 @@ public class Spindexer {
                         target += 120;
                     }
                 }
+                sorted = true;
             } else {
                 moveEmptySlot();
             }
@@ -116,6 +118,7 @@ public class Spindexer {
     }
 
     public void shoot(){
+        sorted = false;
         target -= 360;
         for (int i = 2; i >= 0; i--) {
             if (stored.get(i).equals("E")){
