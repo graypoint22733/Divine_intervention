@@ -22,7 +22,7 @@ public class Spindexer {
     private Sensorange encoder;
 
     private StateMachine state;
-    public static double P = 0.0008, D = 0.0001;
+    public static double P = 0.002, D = 0.0001;
     private PIDF pid = new PIDF(P, D);
     private double target = -44;
 
@@ -131,7 +131,7 @@ public class Spindexer {
     }
 
     private void setPower(double pow){
-        pow = Utils.minMaxClip(pow, -1, 1);
+        pow = Utils.minMaxClip(pow, -0.3, 0.3);
         LServo.setPower(pow);
         RServo.setPower(pow);
     }
