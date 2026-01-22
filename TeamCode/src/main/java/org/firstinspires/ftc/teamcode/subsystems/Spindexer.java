@@ -141,13 +141,13 @@ public class Spindexer {
     }
 
     private String detectColor(ColorSensor sensor) {
-        status = "YES, THE THING IS RUNNING";
         int r = sensor.red();
         int g = sensor.green();
         int b = sensor.blue();
+        status = "r: " + r + " g: " + g + " b: " + b;
         if (g > r && g > b && g > 2000) {return "G";}
         if (b > g && b > 2000) {return "P";}
-        return "E";
+        if (b < 200 && g < 200 && r < 200){return "E";}
     }
 
     private boolean runPID(){
