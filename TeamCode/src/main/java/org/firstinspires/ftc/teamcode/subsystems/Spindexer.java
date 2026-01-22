@@ -148,6 +148,7 @@ public class Spindexer {
         if (g > r && g > b && g > 2000) {return "G";}
         if (b > g && b > 2000) {return "P";}
         if (b < 200 && g < 200 && r < 200){return "E";}
+        return "???";
     }
 
     private boolean runPID(){
