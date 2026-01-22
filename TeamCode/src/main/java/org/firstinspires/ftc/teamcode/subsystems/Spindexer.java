@@ -129,8 +129,8 @@ public class Spindexer {
     }
 
     private void setPower(double pow){
-        LServo.setPower(pow);
-        RServo.setPower(pow);
+        // LServo.setPower(pow);
+        // RServo.setPower(pow);
     }
 
     public void scanDexer(){
