@@ -35,7 +35,7 @@ public class Sensorange{
         lastCheckedPosition = encoderResult;
     }
 
-    public Double getValue() {
+    public double getValue() {
         return lastCheckedPosition;
     }
 

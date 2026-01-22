@@ -23,7 +23,7 @@ public class Spindexer {
     private StateMachine state;
     public static double P = 0.05, D = 0.001;
     private PIDF pid = new PIDF(P, D);
-    private double target;
+    private double target = -44;
 
     private ArrayList<String> motif = new ArrayList<>();
     private ArrayList<String> stored = new ArrayList<>();
@@ -130,8 +130,8 @@ public class Spindexer {
     }
 
     private void setPower(double pow){
-        // LServo.setPower(pow);
-        // RServo.setPower(pow);
+        LServo.setPower(pow);
+        RServo.setPower(pow);
     }
 
     public void scanDexer(){
@@ -153,9 +153,9 @@ public class Spindexer {
     }
 
     private boolean runPID(){
-        // setPower(pid.calculate(encoder.getPosition(), target));
-        // return pid.atSetPoint();
-        return true;
+        setPower(pid.calculate(encoder.getPosition(), target));
+        return pid.atSetPoint();
+        //return true;
     }
 
     public boolean isFull(){
