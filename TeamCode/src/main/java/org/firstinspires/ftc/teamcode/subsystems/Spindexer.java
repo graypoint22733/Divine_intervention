@@ -131,7 +131,7 @@ public class Spindexer {
     }
 
     private void setPower(double pow){
-        pow = Utils.minMaxClip(pow, -0.3, 0.3);
+        pow = Utils.minMaxClip(pow, -0.1, 0.1);
         LServo.setPower(pow);
         RServo.setPower(pow);
     }
