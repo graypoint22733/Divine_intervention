@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.hardware.lynx.LynxModule;
  
 import org.firstinspires.ftc.teamcode.util.statemachine.State;
 import org.firstinspires.ftc.teamcode.util.statemachine.StateMachine;
@@ -30,6 +31,8 @@ public class Robot {
     public static double rP = 0.01, rD = 0.001;
     private PIDF rpid = new PIDF(rP, rD);
 
+    private List<LynxModule> allHubs;
+
     public Robot (HardwareMap map) {
         shooter = new Shooter(map);
         spindex = new Spindexer(map);
@@ -43,6 +46,11 @@ public class Robot {
 
         tpid.setTolerance(20);
         rpid.setTolerance(3);
+
+        allHubs = map.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
   
         State[] states = createStates();
         state = new StateMachine(states);
@@ -120,6 +128,9 @@ public class Robot {
     }
 
     public void update(){
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
         state.run();
 
         shooter.update();
