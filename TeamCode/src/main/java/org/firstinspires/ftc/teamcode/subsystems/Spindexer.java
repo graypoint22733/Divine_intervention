@@ -22,7 +22,7 @@ public class Spindexer {
     private Sensorange encoder;
 
     private StateMachine state;
-    public static double P = 0.0005, D = 0.0001;
+    public static double P = 0.002, D = 0.0001;
     private PIDF pid = new PIDF(P, D);
     private double target = -44;
 
@@ -185,7 +185,8 @@ public class Spindexer {
                 "sensorA =" + colora.red() + " " + colora.green() + " " + colora.blue() + stored.get(0) +
                 "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) +
                 "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) +
-                "ENCODER!! ENCODER!! " + encoder
+                "ENCODER!! ENCODER!! " + encoder.getPosition() + 
+                "TARGET " + target
                 + "}";
     }
 }
