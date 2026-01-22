@@ -96,7 +96,6 @@ public class Robot {
         states[3] = new State("SORT")
                 .setEntry(() -> {
                     requestSort = false;
-                    spindex.enableSort();
                 })
                 .setFallbackState("IDLE")
                 .addTransition(new Transition(() -> requestIdle, "IDLE"))
@@ -180,9 +179,11 @@ public class Robot {
 
     }
     public void requestSort(){
+        spindex.enableSort();
         requestSort = true;
     }
     public void requestShot(){
+        spindex.disableSort();
         requestShot = true;
     }
 
