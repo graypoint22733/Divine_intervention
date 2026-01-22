@@ -91,6 +91,7 @@ public class Spindexer {
     // }
 
     public void update(){
+        encoder.calculateValue();
         if (runPID()){
             scanDexer();
             if (sort) {
