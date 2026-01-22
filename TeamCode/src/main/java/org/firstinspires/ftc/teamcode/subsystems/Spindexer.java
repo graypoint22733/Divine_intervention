@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.util.PIDF;
 import org.firstinspires.ftc.teamcode.util.wrappers.Sensorange;
 import org.firstinspires.ftc.teamcode.util.statemachine.State;
 import org.firstinspires.ftc.teamcode.util.statemachine.StateMachine;
-import org.firstinspires.ftc.teamcode.util.Utils;
 
 public class Spindexer {
     private CRServo LServo;
@@ -30,7 +29,9 @@ public class Spindexer {
     private ArrayList<String> stored = new ArrayList<>();
     private boolean requestFire, requestSort, requestIdle = false;
     private boolean sort = false;
+    private boolean sorted = false;
     private String status = "NO, THE THING IS NOT RUNNING";
+    private double maxServoSpeed = 0.1;
 
     public Spindexer(HardwareMap map){
         LServo = map.get(CRServo.class, "IndexServoL");
@@ -43,8 +44,6 @@ public class Spindexer {
         colorc = map.get(ColorSensor.class, "color3");
 
         pid.setTolerance(3);
-
-        scanDexer();
 
         // State[] states = createStates();
         // state = new StateMachine(states);
@@ -93,9 +92,9 @@ public class Spindexer {
 
     public void update(){
         encoder.calculateValue();
-        if (runPID()){
+        if (!runPID()){
             scanDexer();
-            if (sort) {
+            if (sort && !sorted) {
                 int p = 0, g = 0;
                 for (String s : stored) {
                     p += s.equals("P") ? 1 : 0;
@@ -111,6 +110,7 @@ public class Spindexer {
                         target += 120;
                     }
                 }
+                sorted = true;
             } else {
                 moveEmptySlot();
             }
@@ -118,6 +118,7 @@ public class Spindexer {
     }
 
     public void shoot(){
+        sorted = false;
         target -= 360;
         for (int i = 2; i >= 0; i--) {
             if (stored.get(i).equals("E")){
@@ -127,13 +128,13 @@ public class Spindexer {
     }
 
     private void moveEmptySlot(){
-        target += stored.indexOf("E") % 2 == 0 ? (stored.indexOf("E") + 2) * 120 : 0;
+        //target += stored.indexOf("E") % 2 == 0 ? (stored.indexOf("E") + 2) * 120 : 0;
     }
 
     private void setPower(double pow){
-        pow = Utils.minMaxClip(pow, -0.1, 0.1);
-        LServo.setPower(pow);
-        RServo.setPower(pow);
+        double actualpow = Math.max(-maxServoSpeed, Math.min(pow, maxServoSpeed));
+        LServo.setPower(actualpow);
+        RServo.setPower(actualpow);
     }
 
     public void scanDexer(){
@@ -182,9 +183,9 @@ public class Spindexer {
     @Override
     public String toString(){
         return "Spindexer {" +
-                "sensorA =" + colora.red() + " " + colora.green() + " " + colora.blue() + stored.get(0) +
-                "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) +
-                "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) +
+                // "sensorA =" + colora.red() + " " + colora.green() + " " + colora.blue() + stored.get(0) +
+                // "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) +
+                // "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) +
                 "ENCODER!! ENCODER!! " + encoder.getPosition() + 
                 "TARGET " + target
                 + "}";
