@@ -1,196 +1,234 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import java.util.ArrayList;
-
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.teamcode.util.PIDF;
 import org.firstinspires.ftc.teamcode.util.wrappers.Sensorange;
-import org.firstinspires.ftc.teamcode.util.statemachine.State;
-import org.firstinspires.ftc.teamcode.util.statemachine.StateMachine;
 
 public class Spindexer {
-    private CRServo LServo;
-    private CRServo RServo;
 
-    private ColorSensor colora;
-    private ColorSensor colorb;
-    private ColorSensor colorc;
-    private Sensorange encoder;
+    /* ================= ENUMS ================= */
 
-    private StateMachine state;
-    public static double P = 0.0015, D = 0.0005;
-    private PIDF pid = new PIDF(P, D);
-    private double maxServoSpeed = 0.3;
-    private double target = -44;
+    private enum Pixel {
+        EMPTY, GREEN, PURPLE
+    }
 
-    private ArrayList<String> motif = new ArrayList<>();
-    private ArrayList<String> stored = new ArrayList<>();
-    private boolean requestFire, requestSort, requestIdle = false;
-    private boolean sort = false;
+    /* ================= HARDWARE ================= */
+
+    private final CRServo leftServo;
+    private final CRServo rightServo;
+
+    private final ColorSensor colorA;
+    private final ColorSensor colorB;
+    private final ColorSensor colorC;
+
+    private final Sensorange encoder;
+
+    /* ================= STATE ================= */
+
+    private final Pixel[] stored = new Pixel[3];
+
+    private boolean sortEnabled = false;
     private boolean sorted = false;
-    private String status = "NO, THE THING IS NOT RUNNING";
 
-    public Spindexer(HardwareMap map){
-        LServo = map.get(CRServo.class, "IndexServoL");
-        RServo = map.get(CRServo.class, "IndexServoR");
+    /* ================= PID ================= */
+
+    public static double P = 0.0015;
+    public static double D = 0.0005;
+
+    private final PIDF pid = new PIDF(P, D);
+    private double target = -44;
+    private final double maxServoSpeed = 0.3;
+
+    /* ================= TIMING ================= */
+
+    private long lastScanTime = 0;
+    private static final long SCAN_INTERVAL_MS = 40;
+
+    /* ================= CACHE ================= */
+
+    private double lastServoPower = 0;
+    private int emptyCount = 3;
+
+    /* ================= CONSTRUCTOR ================= */
+
+    public Spindexer(HardwareMap map) {
+
+        leftServo  = map.get(CRServo.class, "IndexServoL");
+        rightServo = map.get(CRServo.class, "IndexServoR");
 
         encoder = new Sensorange("encoder", map);
 
-        colora = map.get(ColorSensor.class, "color1");
-        colorb = map.get(ColorSensor.class, "color2");
-        colorc = map.get(ColorSensor.class, "color3");
-        stored.add("E");
-        stored.add("E");
-        stored.add("E");
+        colorA = map.get(ColorSensor.class, "color1");
+        colorB = map.get(ColorSensor.class, "color2");
+        colorC = map.get(ColorSensor.class, "color3");
 
         pid.setTolerance(3);
 
-        // State[] states = createStates();
-        // state = new StateMachine(states);
+        for (int i = 0; i < 3; i++) {
+            stored[i] = Pixel.EMPTY;
+        }
     }
 
-    // private State[] createStates(){
-    //     State[] states = new State[3];
+    /* ================= UPDATE ================= */
 
-    //     states[0] = new State("IDLE")
-    //         .setEntry(() -> {
-    //             requestIdle = false;
-    //         })
-    //         .setDuring(() -> {
-    //             scanDexer();
-    //             runPID();
-    //         })
-    //         .addTransition(new Transition(() -> requestFire, "SHOOT"))
-    //         .addTransition(new Transition(() -> requestSort, "SORT"));
+    public void update() {
 
-    //     states[1] = new State("SHOOT")
-    //         .setEntry(() -> {
-    //             requestFire = false;
-    //             setPower(-1);
-    //         })
-    //         .setDuring(() -> {
-    //             scanDexer();
-    //         })
-    //         .setFallbackState("IDLE")
-    //         .addTransition(new Transition(() -> requestIdle, "IDLE"))
-    //         .addTransition(new Transition(() -> requestSort, "SORT"));
-        
-    //     states[2] = new State("SORT")
-    //         .setEntry(() -> {
-    //             requestSort = false;
-    //         })
-    //         .setDuring(() -> {
-    //             scanDexer();
-    //             if (runPID()) {runSort();}
-    //         })
-    //         .setFallbackState("IDLE")
-    //         .addTransition(new Transition(() -> requestIdle, "IDLE"))
-    //         .addTransition(new Transition(() -> requestFire, "SHOOT"));
-    
-    //     return states;
-    // }
-
-    public void update(){
         encoder.calculateValue();
-        if (!runPID()){
-            if (sort && !sorted) {
+
+        if (!runPID()) {
+            if (sortEnabled && !sorted) {
                 scanDexer();
-                int p = 0, g = 0;
-                for (String s : stored) {
-                    p += s.equals("P") ? 1 : 0;
-                    g += s.equals("G") ? 1 : 0;
-                }
-                if (g + p != 3) {
-                    moveEmptySlot();
-                } else if (g == 3 || p == 3) { // do nothing
-                } else if (g == 1) { // sorting logic
-                    target += 120 * ((motif.indexOf("G") - stored.indexOf("G") + 3) % 3);
-                } else { // 2g 1p, get 2 correct
-                    if (motif.get(stored.indexOf("P")) != "P") {
-                        target += 120;
-                    }
-                }
-                sorted = g + p == 3;
+                runSortLogic();
             } else {
                 moveEmptySlot();
             }
         }
     }
 
-    public void shoot(){
-        sorted = false;
-        target -= 360;
-        // for (int i = 2; i >= 0; i--) {
-        //     if (stored.get(i).equals("E")){
-        //         target += 120;
-        //     } else {break;}
-        // }
+    /* ================= SORT LOGIC ================= */
+
+    private void runSortLogic() {
+
+        int greenCount = 0;
+        int purpleCount = 0;
+
+        int greenIndex = -1;
+        int emptyIndex = -1;
+
+        for (int i = 0; i < 3; i++) {
+            if (stored[i] == Pixel.GREEN) {
+                greenCount++;
+                greenIndex = i;
+            } else if (stored[i] == Pixel.PURPLE) {
+                purpleCount++;
+            } else {
+                emptyIndex = i;
+            }
+        }
+
+        int total = greenCount + purpleCount;
+        sorted = (total == 3);
+
+        if (sorted) return;
+
+        if (total < 3 && emptyIndex != -1) {
+            moveEmptySlot();
+            return;
+        }
+
+        // Example logic: rotate to align GREEN
+        if (greenCount == 1 && greenIndex != 0) {
+            target += 120 * ((greenIndex + 3) % 3);
+        }
     }
 
-    private void moveEmptySlot(){
-        //target += stored.indexOf("E") % 2 == 0 ? (stored.indexOf("E") + 2) * 120 : 0;
+    /* ================= SENSOR SCAN ================= */
+
+    private void scanDexer() {
+        long now = System.currentTimeMillis();
+        if (now - lastScanTime < SCAN_INTERVAL_MS) return;
+        lastScanTime = now;
+
+        emptyCount = 0;
+
+        stored[0] = detectColor(colorA);
+        stored[1] = detectColor(colorB);
+        stored[2] = detectColor(colorC);
+
+        for (Pixel p : stored) {
+            if (p == Pixel.EMPTY) emptyCount++;
+        }
     }
 
-    private void setPower(double pow){
-        double actualpow = Math.max(-maxServoSpeed, Math.min(pow, maxServoSpeed));
-        LServo.setPower(actualpow);
-        RServo.setPower(actualpow);
-    }
+    private Pixel detectColor(ColorSensor sensor) {
 
-    public void scanDexer(){
-        stored.clear();
-        stored.add(detectColor(colora));
-        stored.add(detectColor(colorb));
-        stored.add(detectColor(colorc));
-    }
-
-    private String detectColor(ColorSensor sensor) {
         int r = sensor.red();
         int g = sensor.green();
         int b = sensor.blue();
-        status = "r: " + r + " g: " + g + " b: " + b;
-        if (g > r && g > b && g - b > 100) {return "G";}
-        if (b > g && b - g > 200 && r > 500) {return "P";}
-        return "E";
+
+        if (g > r && g > b && g - b > 100) {
+            return Pixel.GREEN;
+        }
+
+        if (b > g && b - g > 200 && r > 500) {
+            return Pixel.PURPLE;
+        }
+
+        return Pixel.EMPTY;
     }
 
-    private boolean runPID(){
+    /* ================= PID ================= */
+
+    private boolean runPID() {
+
+        if (pid.atSetPoint()) {
+            setPower(0);
+            return true;
+        }
+
         setPower(pid.calculate(encoder.getPosition(), target));
+        return false;
+    }
+
+    /* ================= ACTUATION ================= */
+
+    private void setPower(double power) {
+
+        double clipped = Math.max(-maxServoSpeed, Math.min(power, maxServoSpeed));
+
+        if (clipped != lastServoPower) {
+            leftServo.setPower(clipped);
+            rightServo.setPower(clipped);
+            lastServoPower = clipped;
+        }
+    }
+
+    private void moveEmptySlot() {
+        // Implement if needed — left intentionally lightweight
+    }
+
+    /* ================= COMMANDS ================= */
+
+    public void shoot() {
+        sorted = false;
+        target -= 360;
+    }
+
+    public void enableSort() {
+        sortEnabled = true;
+    }
+
+    public void disableSort() {
+        sortEnabled = false;
+    }
+
+    public boolean isIdle() {
         return pid.atSetPoint();
-        //return true;
     }
 
-    public boolean isFull(){
-        return stored.indexOf("E") == -1;
+    public boolean isEmpty() {
+        return emptyCount == 3;
     }
 
-    public boolean isEmpty(){
-        return pid.atSetPoint();
-        //return stored.indexOf("P") == -1 && stored.indexOf("G") == -1;
+    public boolean isFull() {
+        return emptyCount == 0;
     }
 
-    public boolean isIdle(){
-        return pid.atSetPoint();
-    }
-
-    public void enableSort(){sort = true;}
-    public void disableSort(){sort = false;}
-
-    public void pleasekillmeiwannadie(){setPower(0.5);}
-    public void youbetterflymeouttoworlds(){setPower(-0.5);}
-    public void iamsacrificingmyfutureforthis(){setPower(0);}
-
-    @Override
-    public String toString(){
-        return "Spindexer {" +
-                // "sensorA =" + colora.red() + " " + colora.green() + " " + colora.blue() + stored.get(0) +
-                // "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) +
-                // "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) +
-                "ENCODER!! ENCODER!! " + encoder.getPosition() + 
-                "TARGET " + target
-                + "}";
+    public void pleasekillmeiwannadie(){setPower(0.5);} 
+    public void youbetterflymeouttoworlds(){setPower(-0.5);} 
+    public void iamsacrificingmyfutureforthis(){setPower(0);} 
+    
+    @Override 
+    public String toString(){ 
+        return "Spindexer {" + 
+            // "sensorA =" + colora.red() + " " + colora.green() + " " + colora.blue() + stored.get(0) + 
+            // "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) + 
+            // "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) + 
+            "ENCODER!! ENCODER!! " + encoder.getPosition() + 
+            "TARGET " + target 
+            + "}";
     }
 }
