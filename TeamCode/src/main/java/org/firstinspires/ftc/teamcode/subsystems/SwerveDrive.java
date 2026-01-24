@@ -31,26 +31,23 @@ public class SwerveDrive {
 
     private double imuOffset = 180;
 
-    private static final double HEADING_LOCK_KP = 0.002;
-    private static final double HEADING_LOCK_KI = 0.00002;
-    private static final double HEADING_LOCK_KD = 0.0001;
-    private static final double HEADING_LOCK_KF = 0.00005;
-    private static final double HEADING_LOCK_KL = 0.1;
-    private static final double HEADING_LOCK_DEADBAND = 1e-3;
 
     private final PIDcontroller headingLockPID = new PIDcontroller(
-            HEADING_LOCK_KP,
-            HEADING_LOCK_KD,
-            HEADING_LOCK_KI,
-            HEADING_LOCK_KF,
-            HEADING_LOCK_KL
+            SwerveTeleOpConfig.HEADING_LOCK_KP,
+            SwerveTeleOpConfig.HEADING_LOCK_KD,
+            SwerveTeleOpConfig.HEADING_LOCK_KI,
+            SwerveTeleOpConfig.HEADING_LOCK_KF,
+            SwerveTeleOpConfig.HEADING_LOCK_KL
     );
-    private double headingLockTarget = 0;
-    private boolean headingLockActive = false;
+
+    double HEADING_LOCK_DEADBAND = SwerveTeleOpConfig.HEADING_LOCK_DEADBAND;
 
     // Safety Variables
     private boolean initialized = false;
     private double lastGoodHeading = 180; // Failsafe for IMU singularity
+    private double headingLockTarget = 0;
+    private boolean headingLockActive = false;
+
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;

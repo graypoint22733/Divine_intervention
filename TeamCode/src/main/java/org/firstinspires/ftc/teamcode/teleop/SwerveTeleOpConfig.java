@@ -38,5 +38,14 @@ public class SwerveTeleOpConfig {
     // =========================================================
     // Effective radius of rotation. Increase this if the robot spins too fast/slow relative to drive.
     // In your old code this was implicitly "1.0".
-    public static double ROBOT_RADIUS = 1.0; 
+    public static double ROBOT_RADIUS = 1.0;
+
+    //Bot Heading PID coefficients public static
+    public static double HEADING_LOCK_KP = 0.002;
+    public static double HEADING_LOCK_KI = 0.00002;
+    public static double HEADING_LOCK_KD = 0.0001;
+    public static  double HEADING_LOCK_KF = 0.00005;
+    public static  double HEADING_LOCK_KL = 0.1;
+    public static double HEADING_LOCK_DEADBAND = 1e-3;
+
 }
