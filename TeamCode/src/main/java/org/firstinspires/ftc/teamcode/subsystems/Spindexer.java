@@ -42,6 +42,7 @@ public class Spindexer {
 
     private final PIDF pid = new PIDF(P, D);
     private double target = -44;
+    private double targetTwo = -44;
     private final double maxServoSpeed = 0.3;
 
     /* ================= TIMING ================= */
@@ -67,7 +68,7 @@ public class Spindexer {
         colorB = map.get(ColorSensor.class, "color2");
         colorC = map.get(ColorSensor.class, "color3");
 
-        pid.setTolerance(3);
+        pid.setTolerance(5);
 
         for (int i = 0; i < 3; i++) {
             stored[i] = Pixel.EMPTY;
@@ -87,7 +88,7 @@ public class Spindexer {
             } else {
                 moveEmptySlot();
             }
-        }
+        } else {target = targetTwo;}
     }
 
     /* ================= SORT LOGIC ================= */
@@ -124,7 +125,9 @@ public class Spindexer {
 
         // Example logic: rotate to align GREEN
         if (greenCount == 1 && greenIndex != 0) {
-            target += 120 * ((greenIndex - greenMotif + 3) % 3);
+            double toSort = 120 * ((greenIndex - greenMotif + 3) % 3);
+            target += 360 + toSort;
+            targetTwo += toSort;
         }
 
         // screw slopdexer it doesnt sort 2g1p ill do that later
@@ -200,6 +203,7 @@ public class Spindexer {
     public void shoot() {
         sorted = false;
         target -= 360;
+        targetTwo -= 360;
     }
 
     public void enableSort() {
