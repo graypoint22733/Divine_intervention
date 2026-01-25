@@ -59,8 +59,8 @@ public class Spindexer {
 
     public Spindexer(HardwareMap map) {
 
-        leftServo  = CrServoCaching(map.get(CRServo.class, "IndexServoL"));
-        rightServo = CrServoCaching(map.get(CRServo.class, "IndexServoR"));
+        leftServo  = new CrServoCaching(map.get(CRServo.class, "IndexServoL"));
+        rightServo = new CrServoCaching(map.get(CRServo.class, "IndexServoR"));
 
         encoder = new Sensorange("encoder", map);
 
