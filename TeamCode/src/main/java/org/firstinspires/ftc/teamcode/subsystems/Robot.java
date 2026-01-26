@@ -115,10 +115,10 @@ public class Robot {
                 })
                 .setDuring(() -> {
                     shooter.updatePose(pose);
+                    requestShot = false;
                 })
                 .setExit(() -> {
                     shooter.requestIdle();
-                    requestShot = false;
                 })
                 .setFallbackState("IDLE")
                 .addTransition(new Transition(() -> spindex.isEmpty(), "IDLE"))
