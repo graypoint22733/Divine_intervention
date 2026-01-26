@@ -237,7 +237,8 @@ public class Spindexer {
             // "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) + 
             // "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) + 
             "ENCODER!! ENCODER!! " + encoder.getPosition() + 
-            "TARGET " + target 
+            "TARGET " + target +
+            "PID says: " + pid.calculate()
             + "}";
     }
 }
