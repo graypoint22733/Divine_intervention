@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 
-import org.firstinspires.ftc.teamcode.util.PIDF;
+import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.utility.CrServoCaching;
 import org.firstinspires.ftc.teamcode.util.wrappers.Sensorange;
 
@@ -40,7 +40,7 @@ public class Spindexer {
     public static double P = 0.0015;
     public static double D = 0.0005;
 
-    private final PIDF pid = new PIDF(P, D);
+    private final PIDcontroller pid = new PIDcontroller(P, D, 0, 0, 0);
     private double target = -44;
     private double targetTwo = -44;
     private final double maxServoSpeed = 0.3;
@@ -68,9 +68,6 @@ public class Spindexer {
         colorA = map.get(ColorSensor.class, "color1");
         colorB = map.get(ColorSensor.class, "color2");
         colorC = map.get(ColorSensor.class, "color3");
-
-        pid.setTolerance(5);
-        pid.setSetPoint(-44);
 
         for (int i = 0; i < 3; i++) {
             stored[i] = Pixel.EMPTY;
@@ -175,12 +172,12 @@ public class Spindexer {
     private boolean runPID() {
         beufbrubf = "YOU FAILED TO SKIN A CAT";
 
-        if (pid.atSetPoint()) {
+        if (Math.abs(target - encoder.getPosition()) < 5) {
             setPower(0);
             return true;
         }
 
-        setPower(pid.calculate(encoder.getPosition(), target));
+        setPower(pid.pidOut(target - encoder.getPosition()));
         return false;
     }
 
@@ -218,7 +215,7 @@ public class Spindexer {
     }
 
     public boolean isIdle() {
-        return pid.atSetPoint();
+        return Math.abs(target - encoder.getPosition) < 5;
     }
 
     public boolean isEmpty() {
@@ -240,8 +237,8 @@ public class Spindexer {
             // "sensorB =" + colorb.red() + " " + colorb.green() + " " + colorb.blue() + stored.get(1) + 
             // "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) + 
             "ENCODER!! ENCODER!! " + encoder.getPosition() + 
-            "TARGET " + target +
-            "PID says: " + pid.calculate() + pid.getSetPoint() + beufbrubf
+            "TARGET " + target
+            //"PID says: " + pid.calculate() + pid.getSetPoint() + beufbrubf
             + "}";
     }
 }
