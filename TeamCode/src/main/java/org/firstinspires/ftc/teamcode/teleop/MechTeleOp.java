@@ -14,6 +14,10 @@ public class MechTeleOp extends LinearOpMode{
     boolean telemetryOn = false;
     boolean telemetryOnTwo = false;
 
+    double driveScale = SwerveTeleOpConfig.DRIVE_SPEED_SCALAR;
+    double rotScale = SwerveTeleOpConfig.ROTATION_SPEED_SCALAR;
+
+
     @Override
     public void runOpMode(){
         robot = new Robot(hardwareMap);
@@ -25,9 +29,9 @@ public class MechTeleOp extends LinearOpMode{
         waitForStart();
 
         while(opModeIsActive()){
-            double strafe = -gamepad1.left_stick_x;
-            double forward = -gamepad1.left_stick_y;
-            double rot = gamepad1.right_stick_x;
+            double strafe = -gamepad1.left_stick_x * driveScale;
+            double forward = -gamepad1.left_stick_y * driveScale;
+            double rot = gamepad1.right_stick_x * rotScale;
             robot.drive(strafe, forward, rot);
 
             if (gamepad1.right_trigger > 0.05) {
