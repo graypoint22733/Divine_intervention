@@ -44,6 +44,7 @@ public class Spindexer {
     private double target = -44;
     private double targetTwo = -44;
     private final double maxServoSpeed = 0.3;
+    private String beufbrubf = "YOU KILLED A CAT";
 
     /* ================= TIMING ================= */
 
@@ -69,6 +70,7 @@ public class Spindexer {
         colorC = map.get(ColorSensor.class, "color3");
 
         pid.setTolerance(5);
+        pid.setSetPoint(-44);
 
         for (int i = 0; i < 3; i++) {
             stored[i] = Pixel.EMPTY;
@@ -171,6 +173,7 @@ public class Spindexer {
     /* ================= PID ================= */
 
     private boolean runPID() {
+        beufbrubf = "YOU FAILED TO SKIN A CAT";
 
         if (pid.atSetPoint()) {
             setPower(0);
@@ -238,7 +241,7 @@ public class Spindexer {
             // "sensorC =" + colorc.red() + " " + colorc.green() + " " + colorc.blue() + stored.get(2) + 
             "ENCODER!! ENCODER!! " + encoder.getPosition() + 
             "TARGET " + target +
-            "PID says: " + pid.calculate() + pid.getSetPoint()
+            "PID says: " + pid.calculate() + pid.getSetPoint() + beufbrubf
             + "}";
     }
 }
