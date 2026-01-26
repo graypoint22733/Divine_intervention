@@ -109,7 +109,7 @@ public class Robot {
         
         states[4] = new State("SHOOT")
                 .setEntry(() -> {
-                    requestShot = false;
+                    requestShot = true;
                     shooter.updatePose(pose);
                     shooter.requestShot();
                     shooter.updateGoal(goal);
@@ -120,6 +120,7 @@ public class Robot {
                 })
                 .setExit(() -> {
                     shooter.requestIdle();
+                    requestShot = false;
                 })
                 .setFallbackState("IDLE")
                 .addTransition(new Transition(() -> spindex.isEmpty(), "IDLE"))
