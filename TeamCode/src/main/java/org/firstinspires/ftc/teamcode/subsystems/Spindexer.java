@@ -175,12 +175,13 @@ public class Spindexer {
     private boolean runPID() {
         beufbrubf = "YOU FAILED TO SKIN A CAT";
 
+        pid.setSetPoint(target);
         if (pid.atSetPoint()) {
             setPower(0);
             return true;
         }
 
-        setPower(pid.calculate(encoder.getPosition(), target));
+        setPower(pid.calculate(encoder.getPosition()));
         return false;
     }
 
