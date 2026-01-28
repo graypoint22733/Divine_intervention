@@ -218,11 +218,14 @@ public class SwerveDrive {
     }
 
     private double getHeading(double polarity) {
-        return AngleUnit.normalizeDegrees(odo.getHeading(AngleUnit.DEGREES) * polarity - imuOffset);
+        double headingDeg = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
+        return AngleUnit.normalizeDegrees(headingDeg * polarity - imuOffset);
     }
 
     public void resetIMU() {
-        imuOffset = odo.getHeading(AngleUnit.DEGREES);
+        if (odo != null) {
+            imuOffset = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
+        }
     }
 
 

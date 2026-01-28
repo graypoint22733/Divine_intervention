@@ -159,6 +159,11 @@ public class Robot {
         shooter.updateGoal(goal);
     }
 
+    public void setPose(Pose2d newPose) {
+        pose = odo.setPosition(newPose);
+        shooter.updatePose(pose);
+    }
+
     public void updateTelemetry(Telemetry telem) {
         telemetry = telem;
         swerve.updateTelemetry(telem);
