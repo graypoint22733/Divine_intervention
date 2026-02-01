@@ -43,7 +43,11 @@ public class Robot {
         swerve = new SwerveDrive(telemetry, map);
 
         odo = map.get(GoBildaPinpointDriver.class, "odo");
-        odo.setOffsets(-91.5, -181);
+        odo.setOffsets(-211, 43);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
         swerve.updateOdo(odo);
 
         pose = new Pose2d(0, 0, Math.toRadians(0));
