@@ -15,7 +15,7 @@ public class OdoTeleOp extends LinearOpMode{
     @Override
     public void runOpMode(){
         GoBildaPinpointDriver odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        odo.setOffsets(91.5, -181);
+        odo.setOffsets(-91.5, -181);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
