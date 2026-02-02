@@ -101,6 +101,16 @@ public class SwerveDrive {
                       double Kp, double Kd, double Ki, double Kf, double Kl,
                       boolean fieldCentric, double imuPolarity, double robotRadius) {
 
+        // Refresh heading lock tunables live (dashboard edits take effect immediately)
+        headingLockPID.setPIDgains(
+                SwerveTeleOpConfig.HEADING_LOCK_KP,
+                SwerveTeleOpConfig.HEADING_LOCK_KD,
+                SwerveTeleOpConfig.HEADING_LOCK_KI,
+                SwerveTeleOpConfig.HEADING_LOCK_KF,
+                SwerveTeleOpConfig.HEADING_LOCK_KL
+        );
+        HEADING_LOCK_DEADBAND = SwerveTeleOpConfig.HEADING_LOCK_DEADBAND;
+
         if (odo != null) {
             odo.update(GoBildaPinpointDriver.readData.ONLY_UPDATE_HEADING);
         }
@@ -158,7 +168,6 @@ public class SwerveDrive {
                 headingLockPID.reset();
             }
             headingLockActive = false;
-            headingLockTarget = heading;
         }
 
         rot += headingCorrection;
