@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -150,6 +149,9 @@ public class SwerveDrive {
 
             double headingError = AngleUnit.normalizeDegrees(headingLockTarget - heading);
             double dt = headingTimer.seconds();
+            if (dt <= 0) {
+                dt = 1e-3;
+            }
 
             headingIntegral += headingError * dt;
             headingIntegral = com.qualcomm.robotcore.util.Range.clip(
@@ -174,6 +176,7 @@ public class SwerveDrive {
                 headingTimer.reset();
             }
             headingLockActive = false;
+            headingLockTarget = heading;
         }
 
         rot += headingCorrection;
@@ -248,6 +251,13 @@ public class SwerveDrive {
         if (odo != null) {
             imuOffset = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
         }
+        // Reset heading-lock state so we don't chase a stale target after recalibration
+        headingLockTarget = 0;
+        headingIntegral = 0;
+        lastHeadingError = 0;
+        headingTimer.reset();
+        lastGoodHeading = 0;
+        initialized = false; // re-arm lock on next driver input
     }
 
 
