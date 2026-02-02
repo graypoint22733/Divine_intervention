@@ -207,8 +207,8 @@ public class Spindexer {
 
     public void shoot() {
         sorted = false;
-        target -= 600;
-        targetTwo -= 600;
+        target -= 720;
+        targetTwo -= 720;
     }
 
     public void enableSort() {
