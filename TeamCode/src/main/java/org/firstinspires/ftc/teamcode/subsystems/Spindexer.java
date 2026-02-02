@@ -98,6 +98,7 @@ public class Spindexer {
 
     private void runSortLogic() {
         if (sorted) return;
+        beufbrubf = "SORTING AT LEAST TRIES";
 
         int greenCount = 0;
         int purpleCount = 0;
