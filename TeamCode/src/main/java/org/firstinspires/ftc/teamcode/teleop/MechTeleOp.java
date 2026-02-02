@@ -29,8 +29,8 @@ public class MechTeleOp extends LinearOpMode{
         waitForStart();
 
         while(opModeIsActive()){
-            double strafe = -gamepad1.left_stick_x * driveScale;
-            double forward = -gamepad1.left_stick_y * driveScale;
+            double strafe = gamepad1.left_stick_x * driveScale;
+            double forward = gamepad1.left_stick_y * driveScale;
             double rot = -gamepad1.right_stick_x * rotScale;
             robot.drive(strafe, forward, rot);
 

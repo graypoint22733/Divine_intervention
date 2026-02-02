@@ -31,7 +31,7 @@ public class SwerveTeleOpConfig {
     public static boolean USE_IMU = true;
     
     // Set to -1 if rotating the robot clockwise makes heading DECREASE
-    public static double IMU_POLARITY = -1.0; 
+    public static double IMU_POLARITY = 1.0;
 
     // =========================================================
     // 4. KINEMATICS / GEOMETRY
@@ -40,7 +40,7 @@ public class SwerveTeleOpConfig {
     // In your old code this was implicitly "1.0".
     public static double ROBOT_RADIUS = 1.0;
 
-    public static double HEADING_LOCK_KP = 0.002;
+    public static double HEADING_LOCK_KP = 0.0003;
     public static double HEADING_LOCK_KI = 0.00000;
     public static double HEADING_LOCK_KD = 0.0000;
     public static  double HEADING_LOCK_KF = 0.00000;
