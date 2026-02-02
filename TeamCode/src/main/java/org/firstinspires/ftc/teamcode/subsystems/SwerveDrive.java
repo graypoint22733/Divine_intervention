@@ -30,7 +30,7 @@ public class SwerveDrive {
 
     private final swerveKinematics kinematics = new swerveKinematics();
 
-    private double imuOffset = 180;
+    private double imuOffset = 0;
 
 
     // Heading correction (ported closely to user's previous implementation)
@@ -136,10 +136,8 @@ public class SwerveDrive {
             }
         }
 
-        // === Heading correction (minimal port from user's prior teleop) ===
         double headingCorrection = 0;
         if (needsHeading && odo != null) {
-            // Reset target shortly after driver commands rotation (200ms grace)
             if (Math.abs(rot) > 0.05) {
                 headingReset.reset();
             }
@@ -234,7 +232,6 @@ public class SwerveDrive {
         if (odo != null) {
             imuOffset = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
         }
-        // Reset heading-lock state so we don't chase a stale target after recalibration
         headingTarget = 0;
         lastHeadingError = 0;
         headingDt.reset();
