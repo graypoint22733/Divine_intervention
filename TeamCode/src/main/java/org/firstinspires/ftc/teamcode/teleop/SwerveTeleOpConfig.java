@@ -31,7 +31,8 @@ public class SwerveTeleOpConfig {
     public static boolean USE_IMU = true;
     
     // Set to -1 if rotating the robot clockwise makes heading DECREASE
-    public static double IMU_POLARITY = 1.0;
+    // Defaulting to -1 to match the GoBilda Pinpoint yaw direction used in this bot.
+    public static double IMU_POLARITY = -1.0;
 
     // =========================================================
     // 4. KINEMATICS / GEOMETRY

@@ -31,6 +31,7 @@ public class SwerveDrive {
     private final swerveKinematics kinematics = new swerveKinematics();
 
     private double imuOffset = 0;
+    private boolean imuZeroed = false;
 
 
     // Heading correction (ported closely to user's previous implementation)
@@ -102,6 +103,12 @@ public class SwerveDrive {
 
         if (odo != null) {
             odo.update(GoBildaPinpointDriver.readData.ONLY_UPDATE_HEADING);
+            // Auto-zero IMU once at startup using the same math as getHeading(), so heading reads 0 at startup.
+            if (!imuZeroed) {
+                double rawDeg = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
+                imuOffset = rawDeg * SwerveTeleOpConfig.IMU_POLARITY - SwerveTeleOpConfig.HEADING_FRAME_OFFSET_DEG;
+                imuZeroed = true;
+            }
         }
 
         if (Double.isNaN(forward) || Double.isNaN(strafe) || Double.isNaN(rot)) {
@@ -165,7 +172,7 @@ public class SwerveDrive {
             headingDt.reset();
         }
 
-        rot += headingCorrection;
+        rot -= headingCorrection;
         rot = Math.max(-1.0, Math.min(1.0, rot));
 
         // 5. Calculate Kinematics (Vectors)
@@ -235,7 +242,8 @@ public class SwerveDrive {
 
     public void resetIMU() {
         if (odo != null) {
-            imuOffset = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
+            double rawDeg = Math.toDegrees(odo.getHeading(AngleUnit.RADIANS));
+            imuOffset = rawDeg * SwerveTeleOpConfig.IMU_POLARITY - SwerveTeleOpConfig.HEADING_FRAME_OFFSET_DEG;
         }
         headingTarget = 0;
         lastHeadingError = 0;
@@ -244,6 +252,7 @@ public class SwerveDrive {
         headingTargetSet = false;
         lastGoodHeading = 0;
         initialized = false; // re-arm lock on next driver input
+        imuZeroed = true;
     }
 
 
