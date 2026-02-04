@@ -180,7 +180,7 @@ public class Spindexer {
         pid.setSetPoint(target);
         double potato = pid.calculate(encoder.getPosition());
         setPower(potato);
-        return potato < 0.05;
+        return Math.abs(potato) < 0.05;
         // if (potato < 0.05) {
         //     return true;
         // }
