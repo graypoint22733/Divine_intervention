@@ -127,6 +127,7 @@ public class Spindexer {
         beufbrubf = "SORTING GOT " + greenCount + "GREENS AND " + purpleCount + "PURPLES AND" + emptyCount + "EMPTIES WITH GREEN AT" + greenIndex;
 
         // Example logic: rotate to align GREEN
+        if (greenCount == 1 && greenIndex == greenMotif) {target = targetTwo;}
         if (greenCount == 1 && greenIndex != greenMotif) {
             double toSort = 120 * ((greenIndex - greenMotif + 3) % 3);
             target += 80 + toSort;
@@ -147,8 +148,8 @@ public class Spindexer {
 
         emptyCount = 0;
 
-        stored[0] = detectColor(colorB);
-        stored[1] = detectColor(colorC);
+        stored[0] = detectColor(colorC);
+        stored[1] = detectColor(colorB);
         stored[2] = detectColor(colorA);
 
         for (Pixel p : stored) {
