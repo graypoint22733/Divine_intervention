@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.lynx.LynxModule;
 import java.util.List;
@@ -33,8 +34,6 @@ public class Robot {
     public static double rP = 0.01, rD = 0.001;
     private final PIDF rpid = new PIDF(rP, rD);
 
-    private List<LynxModule> allHubs;
-
     public Robot (HardwareMap map) {
         //Subsystems
         shooter = new Shooter(map);
@@ -56,11 +55,11 @@ public class Robot {
         tpid.setTolerance(20);
         rpid.setTolerance(3);
 
-        allHubs = map.getAll(LynxModule.class);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
-  
+        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
+
         State[] states = createStates();
         state = new StateMachine(states);
     }
@@ -137,9 +136,6 @@ public class Robot {
     }
 
     public void update(){
-        for (LynxModule hub : allHubs) {
-            hub.clearBulkCache();
-        }
         state.run();
 
         shooter.update();
@@ -148,6 +144,9 @@ public class Robot {
         odo.update();
 
         pose = odo.getPosition();
+
+        PhotonCore.CONTROL_HUB.clearBulkCache();
+        PhotonCore.EXPANSION_HUB.clearBulkCache();
     }
 
     public void drive(double strafe, double forward, double rot){
