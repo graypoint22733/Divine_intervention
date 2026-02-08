@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.utility.CrServoCaching;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -13,8 +14,8 @@ import java.util.List;
 public class Vision_Camera {
 
 
-    private final CRServo ServoL;
-    private final CRServo ServoR;
+    private final CrServoCaching ServoL;
+    private final CrServoCaching ServoR;
 
 
     private final AprilTagProcessor aprilTag;
@@ -28,10 +29,10 @@ public class Vision_Camera {
     public Vision_Camera(HardwareMap hardwareMap) {
 
 
-        ServoL = hardwareMap.get(CRServo.class, "ServoL");
+        ServoL = (CrServoCaching) hardwareMap.get(CRServo.class, "ServoL");
         ServoL.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        ServoR = hardwareMap.get(CRServo.class, "ServoR");
+        ServoR = (CrServoCaching) hardwareMap.get(CRServo.class, "ServoR");
         ServoR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();

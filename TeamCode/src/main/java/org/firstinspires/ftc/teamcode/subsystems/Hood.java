@@ -4,10 +4,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
  
 import org.firstinspires.ftc.teamcode.util.Utils;
+import org.firstinspires.ftc.teamcode.utility.ServoCaching;
 
 public class Hood {
  
-    final private Servo servo;
+    final private ServoCaching.CachingServo servo;
     private boolean needsUpdate = false;
     private double pos = 0;
 
@@ -16,7 +17,7 @@ public class Hood {
     private static final double SERVO_TO_ANGLE = 10;
  
     public Hood (HardwareMap map) {
-        servo = map.get(Servo.class, "hood");
+        servo = (ServoCaching.CachingServo) map.get(Servo.class, "hood");
     }
 
     public void setPosition(double target){

@@ -19,8 +19,8 @@ public class Spindexer {
 
     /* ================= HARDWARE ================= */
 
-    private final CRServo leftServo;
-    private final CRServo rightServo;
+    private final CrServoCaching leftServo;
+    private final CrServoCaching rightServo;
 
     private final ColorSensor colorA;
     private final ColorSensor colorB;
@@ -61,8 +61,8 @@ public class Spindexer {
 
     public Spindexer(HardwareMap map) {
 
-        leftServo  = map.get(CRServo.class, "IndexServoL");
-        rightServo = map.get(CRServo.class, "IndexServoR");
+        leftServo  = (CrServoCaching) map.get(CRServo.class, "IndexServoL");
+        rightServo = (CrServoCaching) map.get(CRServo.class, "IndexServoR");
 
         encoder = new Sensorange("encoder", map);
 
