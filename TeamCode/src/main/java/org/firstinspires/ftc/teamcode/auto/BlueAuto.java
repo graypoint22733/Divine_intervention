@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 @Autonomous(name = "Blue Auto", group = "Auton", preselectTeleOp = "TeleOP")
@@ -17,4 +18,9 @@ public class BlueAuto extends OpMode {
     public void loop() {
 
     }
+
+    @Override
+    public void stop() {
+    }
+
 }

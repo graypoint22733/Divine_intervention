@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
 import org.firstinspires.ftc.teamcode.maths.mathsOperations;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
+import org.firstinspires.ftc.teamcode.util.Pose2d;
 import org.firstinspires.ftc.teamcode.util.drivers.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utility.myDcMotorEx;
 import org.firstinspires.ftc.teamcode.teleop.SwerveTeleOpConfig;
@@ -45,7 +46,6 @@ public class SwerveDrive {
     // Safety Variables
     private boolean initialized = false;
     private double lastGoodHeading = 180; // Failsafe for IMU singularity
-
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
