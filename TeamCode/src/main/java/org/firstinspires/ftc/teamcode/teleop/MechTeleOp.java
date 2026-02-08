@@ -25,6 +25,7 @@ public class MechTeleOp extends LinearOpMode{
         robot = new Robot(hardwareMap);
 
         robot.init();
+        robot.setPose(Robot.pose);
         robot.updateGoal(goal);
         robot.updateTelemetry(telemetry);
 

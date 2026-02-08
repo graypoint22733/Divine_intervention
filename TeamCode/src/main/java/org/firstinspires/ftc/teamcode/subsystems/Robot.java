@@ -26,7 +26,8 @@ public class Robot {
 
     //State variables
     private boolean requestIntake = false, requestOuttake = false, requestShot = false, requestSort = false, requestIdle = false;
-    private static Pose2d pose, goal;
+    public static Pose2d pose;
+    private static Pose2d goal;
     private Telemetry telemetry;
 
     //PID Constants
