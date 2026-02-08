@@ -92,8 +92,33 @@ public class Spindexer {
 
         encoder.calculateValue();
 
-        if (!runPID()) {
-            if (sortEnabled && !sorted) {
+
+        pid.setSetPoint(target);
+
+        double position = encoder.getPosition();
+        double error = target - position;
+
+        double output;
+
+        if (Math.abs(error) > 2.0) {
+            output = pid.calculate(position);
+            setPower(output);
+        }
+        else {
+            if(Math.abs(error) > 1.0) {
+                if (error < 0.0) {
+                    setPower(-minPower);
+                } else {
+                    setPower(minPower);
+                }
+            }
+            else {
+                setPower(0.0);
+            }
+        }
+
+        if (!sorted) {
+            if (sortEnabled) {
                 scanDexer();
                 runSortLogic();
             } else {
@@ -180,35 +205,6 @@ public class Spindexer {
         }
 
         return Pixel.EMPTY;
-    }
-
-    /* ================= PID ================= */
-
-    private boolean runPID() {
-        pid.setSetPoint(target);   // main PID (coarse)
-
-        double position = encoder.getPosition();
-        double error = target - position;
-
-        double output;
-
-        if (Math.abs(error) > 2.0) {
-            output = pid.calculate(position);
-            setPower(output);
-
-            return false;
-        }
-        else {
-            if(Math.abs(error) > 1.0) {
-                if (error < 0.0) {
-                    setPower(-minPower);
-                } else {
-                    setPower(minPower);
-                }
-            }
-
-            return sorted;
-        }
     }
 
 
