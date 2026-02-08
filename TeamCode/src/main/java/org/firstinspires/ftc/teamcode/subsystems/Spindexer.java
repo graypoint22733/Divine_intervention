@@ -92,16 +92,13 @@ public class Spindexer {
 
         encoder.calculateValue();
 
-
         pid.setSetPoint(target);
 
         double position = encoder.getPosition();
         double error = target - position;
 
-        double output;
-
-        if (Math.abs(error) > 2.0) {
-            output = pid.calculate(position);
+        if (Math.abs(error) > 4.0) {
+            double output = pid.calculate(position);
             setPower(output);
         }
         else {
@@ -117,7 +114,7 @@ public class Spindexer {
             }
         }
 
-        if (!sorted) {
+        /*if (!sorted) {
             if (sortEnabled) {
                 scanDexer();
                 runSortLogic();
@@ -125,6 +122,7 @@ public class Spindexer {
                 moveEmptySlot();
             }
         } else {target = targetTwo;}
+         */
     }
 
     /* ================= SORT LOGIC ================= */

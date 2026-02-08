@@ -14,7 +14,7 @@ public class CrServoCaching implements CRServo {
          */
         public CrServoCaching(CRServo crServo) {
             this.crServo = crServo;
-            new CrServoCaching(crServo, 0.005);
+            new CrServoCaching(crServo, 0.0005);
         }
 
         public CrServoCaching(CRServo crServo, double cachingTolerance) {
