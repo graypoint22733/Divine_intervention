@@ -42,7 +42,7 @@ public class Spindexer {
     public static double P = SwerveTeleOpConfig.P;
     public static double D = 0.00007;
 
-    public static double P2 = 0.1;
+    public static double P2 = 0.001;
 
     public static double D2 = 0.00000001;
 
