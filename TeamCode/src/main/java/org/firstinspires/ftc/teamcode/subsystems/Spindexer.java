@@ -97,24 +97,22 @@ public class Spindexer {
         double position = encoder.getPosition();
         double error = target - position;
 
-        setPower(pid.calculate(position));
-
-//        if (Math.abs(error) > 4.0) {
-//            double output = pid.calculate(position);
-//            setPower(output);
-//        }
-//        else {
-//            if(Math.abs(error) > 1.0) {
-//                if (error < 0.0) {
-//                    setPower(-minPower);
-//                } else {
-//                    setPower(minPower);
-//                }
-//            }
-//            else {
-//                setPower(0.0);
-//            }
-//        }
+        if (Math.abs(error) > 4.0) {
+            double output = pid.calculate(position);
+            setPower(output);
+        }
+        else {
+            if(Math.abs(error) > 1.0) {
+                if (error < 0.0) {
+                    setPower(-minPower);
+                } else {
+                    setPower(minPower);
+                }
+            }
+            else {
+                setPower(0.0);
+            }
+        }
 
         /*if (!sorted) {
             if (sortEnabled) {
