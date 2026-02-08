@@ -182,24 +182,28 @@ public class Spindexer {
     /* ================= PID ================= */
 
     private boolean runPID() {
-        pid.setSetPoint(target);
-       // if(Math.abs(encoder.getPosition()) > Math.abs(pid.getSetPoint()) + 4) {
-            double potato = pid.calculate(encoder.getPosition());
-            setPower(potato);
-            return sorted && Math.abs(potato) < 0.05 || pid.atSetPoint();
-        //}
-        /*else  {
-            double potato2 = pid2.calculate(encoder.getPosition());
-            setPower(potato2);
-            return sorted && Math.abs(potato2) < 0.03 || pid.atSetPoint();
-        }*/
-        // if (potato < 0.05) {
-        //     return true;
-        // }
+        pid.setSetPoint(target);   // main PID (coarse)
+        pid2.setSetPoint(target);  // secondary PIDF (fine)
 
-        // setPower(potato);
-        // return false;
+        double position = encoder.getPosition();
+        double error = target - position;
+
+        double output;
+
+        if (Math.abs(error) > 4.0) {
+            output = pid.calculate(position);
+            setPower(output);
+
+            return false;
+        }
+        else {
+            output = pid2.calculate(position);
+            setPower(output);
+
+            return (sorted && Math.abs(output) < 0.03) || pid2.atSetPoint();
+        }
     }
+
 
     /* ================= ACTUATION ================= */
 
