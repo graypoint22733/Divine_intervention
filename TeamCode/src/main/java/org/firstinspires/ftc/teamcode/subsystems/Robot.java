@@ -17,7 +17,7 @@ public class Robot {
     private final StateMachine state;
 
     //Subsystems
-    private final Shooter shooter;
+    public final Shooter shooter;
     private final Spindexer spindex;
     private final Intake intake;
     private final SwerveDrive swerve;
@@ -180,6 +180,8 @@ public class Robot {
         telemetry = telem;
         swerve.updateTelemetry(telem);
     }
+
+
 
     public void enableSort(){spindex.enableSort();}
     public void disableSort(){spindex.disableSort();}

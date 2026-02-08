@@ -69,7 +69,12 @@ public class Shooter {
         hood.setPosition(IDLE_HOOD);
         turret.setAngle(turret.getAngle());
     }
- 
+
+    public void setHood(double hoodpos)
+    {hood.setPosition(hoodpos);
+    }
+
+
     public void update() {
         flywheel.update();
         state.run();

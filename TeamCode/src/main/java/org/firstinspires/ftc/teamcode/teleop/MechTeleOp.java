@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 @TeleOp(name="TeleOP", group="Human Teleop")
 public class MechTeleOp extends LinearOpMode{
     long lastLoopTime = 0;
+
+    double hoodpos = 0;
     Robot robot;
     Pose2d goal = new Pose2d(0, 0);
     boolean telemetryOn = false;
@@ -70,6 +72,14 @@ public class MechTeleOp extends LinearOpMode{
             } else if (!gamepad1.right_stick_button){
                 telemetryOnTwo = telemetryOn;
             }
+
+            if (gamepad1.a){hoodpos += 0.01;
+            }
+            if (gamepad1.b){hoodpos -= 0.01;
+            }
+            robot.shooter.setHood(hoodpos);
+
+
 
             robot.update();
             long currentTime = System.currentTimeMillis();
