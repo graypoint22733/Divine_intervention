@@ -102,16 +102,8 @@ public class Spindexer {
             setPower(output);
         }
         else {
-            if(Math.abs(error) > 1.0) {
-                if (error < 0.0) {
-                    setPower(-minPower);
-                } else {
-                    setPower(minPower);
-                }
-            }
-            else {
-                setPower(0.0);
-            }
+            double output = pid2.calculate(position);
+            setPower(output);
         }
 
         /*if (!sorted) {
