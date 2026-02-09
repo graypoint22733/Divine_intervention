@@ -29,10 +29,20 @@ public class Turret {
              double currentY = currentPosition.getY();
              double currentH = currentPosition.getHeading();
 
-             double angleToGoal = Math.atan2(GOAL_X - currentX, GOAL_Y - currentY) + 3*Math.PI/2;
+             double angleToGoal = Math.atan2(GOAL_X - currentX, GOAL_Y - currentY) + Math.PI/2;
 
-             setPos((angleToGoal - currentH) / (SERVO_TO_ANGLE * GEAR_RATIO) + 0.5);
+             setPos(clamp((angleToGoal - currentH) / ( GEAR_RATIO) + 0.5, 1));
          }
+     }
+
+     public double clamp(double t, double range) {
+        if(t > range) {
+            return range;
+        }
+        else if(t < -range) {
+            return -range;
+        }
+        return t;
      }
 
      public void sotm() {
