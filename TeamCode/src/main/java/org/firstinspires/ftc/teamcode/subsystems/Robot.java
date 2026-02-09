@@ -22,7 +22,7 @@ public class Robot {
     private final Spindexer spindex;
     private final Intake intake;
     private final SwerveDrive swerve;
-    private final Turret turret;
+    public final Turret turret;
     public final GoBildaPinpointDriver odo;
 
     //State variables
