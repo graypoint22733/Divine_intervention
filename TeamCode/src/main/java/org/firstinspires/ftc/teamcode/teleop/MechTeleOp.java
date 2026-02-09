@@ -73,18 +73,15 @@ public class MechTeleOp extends LinearOpMode{
                 telemetryOnTwo = telemetryOn;
             }
 
-            if (gamepad1.a){hoodpos += 0.01;
-            }
-            if (gamepad1.b){hoodpos -= 0.01;
-            }
+            if (gamepad1.a){hoodpos += 0.01;}
+            if (gamepad1.b){hoodpos -= 0.01;}
             robot.shooter.setHood(hoodpos);
-
-telemetry.addData("hoodpos", hoodpos);
 
             robot.update();
             long currentTime = System.currentTimeMillis();
             long loopTime = currentTime - lastLoopTime;
             lastLoopTime = currentTime;
+            telemetry.addData("hoodpos", hoodpos);
             telemetry.addData("Loop Time (ms)", loopTime);
             telemetry.addData("Frequency (Hz)", 1000.0 / loopTime);
 

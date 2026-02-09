@@ -70,8 +70,8 @@ public class Shooter {
         turret.setAngle(turret.getAngle());
     }
 
-    public void setHood(double hoodpos)
-    {hood.setPosition(hoodpos);
+    public void setHood(double hoodpos){
+        hood.setPosition(hoodpos);
     }
 
 
