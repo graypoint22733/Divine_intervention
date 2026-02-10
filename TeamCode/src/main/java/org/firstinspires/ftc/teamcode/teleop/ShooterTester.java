@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,6 +18,8 @@ import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 @Config
 public class ShooterTester extends OpMode {
     DcMotorEx fM;
+
+    MultipleTelemetry t;
 
     public static double targetVelocity = 0.0;
     public static double currentVelocity = 0.0;
@@ -35,13 +39,21 @@ public class ShooterTester extends OpMode {
     public void init() {
         fM = hardwareMap.get(DcMotorEx.class, "shooter");
         hood = new Hood(hardwareMap);
+        t = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     @Override
     public void loop() {
         cS.setGoal(new KineticState(0.0, targetVelocity));
         currentVelocity = fM.getVelocity();
-        fM.setPower(cS.calculate(new KineticState(0.0, currentVelocity)));
+
+        double power = cS.calculate(new KineticState(0.0, currentVelocity));
+        fM.setPower(power);
         hood.setAngle(hoodPosition);
+
+        t.addData("power", power);
+        t.addData("targetVelocity", targetVelocity);
+        t.addData("currentVelocity", currentVelocity);
+        t.update();
     }
 }
