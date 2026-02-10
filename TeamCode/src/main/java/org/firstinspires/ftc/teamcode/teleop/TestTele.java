@@ -28,7 +28,7 @@ public class TestTele extends LinearOpMode{
         Turret.GOAL_X = -72.0;
 
         robot.init();
-        robot.setPose(new Pose2d(72.0, 72.0, 0.0));
+        robot.setPose(new Pose2d(72.0, 72.0, Math.PI));
 
         robot.updateTelemetry(telemetry);
 
@@ -46,24 +46,24 @@ public class TestTele extends LinearOpMode{
                 robot.requestOuttake();
             }
 
-            if (gamepad1.leftBumperWasPressed()) {
+            if (gamepad1.left_bumper) {
                 robot.requestSort();
             }
             else if (gamepad1.rightBumperWasPressed()) {
                 robot.requestShot();
             }
 
-            if (gamepad1.dpadUpWasPressed()){
+            if (gamepad1.dpad_up){
                 robot.requestIdle();
             }
 
-            if (gamepad1.aWasPressed()) {
+            if (gamepad1.a) {
                 robot.iamsacrificingmyfutureforthis();
             }
-            else if (gamepad1.xWasPressed()) {
+            else if (gamepad1.x) {
                 robot.pleasekillmeiwannadie();
             }
-            else if (gamepad1.yWasPressed()) {
+            else if (gamepad1.y) {
                 robot.youbetterflymeouttoworlds();
             }
 
@@ -73,12 +73,12 @@ public class TestTele extends LinearOpMode{
                 telemetryOnTwo = telemetryOn;
             }
 
-            if(gamepad1.leftStickButtonWasPressed()) {
+            if(gamepad1.left_stick_button) {
                 Turret.tracking = !Turret.tracking;
             }
 
             if(gamepad1.startWasPressed()) {
-                robot.setPose(new Pose2d(72.0, 72.0, 0.0));
+                robot.setPose(new Pose2d(72.0, 72.0, Math.PI));
             }
 
             robot.update();
