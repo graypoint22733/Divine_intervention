@@ -25,7 +25,7 @@ public class ShooterTester extends OpMode {
     public static BasicFeedforwardParameters ff = new BasicFeedforwardParameters(0.0,0.0,0.0);
     public static PIDCoefficients pids = new PIDCoefficients(0.0,0.0,0.0);
 
-    private ControlSystem cS = ControlSystem.builder()
+    private final ControlSystem cS = ControlSystem.builder()
             .basicFF(ff)
             .velPid(pids)
             .build();
@@ -33,7 +33,7 @@ public class ShooterTester extends OpMode {
 
     @Override
     public void init() {
-        fM = (DcMotorEx) hardwareMap.dcMotor.get("shooter");
+        fM = hardwareMap.get(DcMotorEx.class, "shooter");
         hood = new Hood(hardwareMap);
     }
 
