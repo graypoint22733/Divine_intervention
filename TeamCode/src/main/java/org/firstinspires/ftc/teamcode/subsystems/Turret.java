@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 
 public class Turret {
-    public static final double GEAR_RATIO = (67.0 / 18.0) * (37.0 / 112.0);
+    public static final double GEAR_RATIO = (90 / 20.0) * (37.0 / 112.0);
 
     public static final double SERVO_RANGE_RAD = Math.toRadians(355);
 
@@ -33,7 +33,7 @@ public class Turret {
 
         // Error is the difference between goal and current robot heading
         // We subtract Math.PI if the turret "zero" is facing the back of the robot
-        double error = angleWrap(angleToGoal + currentPosition.getHeading());
+        double error = angleWrap(angleToGoal + GEAR_RATIO * currentPosition.getHeading());
 
         // Map the radian error to a 0.0 - 1.0 servo value using gear ratio
         double servoDelta = (error / GEAR_RATIO) / SERVO_RANGE_RAD;
