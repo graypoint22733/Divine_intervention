@@ -49,7 +49,7 @@ public class Turret {
         target = pos;
         LServo.setPosition(pos);
         // Mirroring RServo: if one goes 0.7, the other goes 0.3 to rotate the same direction
-        RServo.setPosition(1.0 - pos);
+        RServo.setPosition(pos);
     }
 
     public void setGoalPositions(double x, double y){
@@ -83,5 +83,10 @@ public class Turret {
 
     private double clamp(double v) {
         return Math.max(0.0, Math.min(1.0, v));
+    }
+
+    @Override
+    public String toString(){
+        return "Turret { " + pos + "}";
     }
 }

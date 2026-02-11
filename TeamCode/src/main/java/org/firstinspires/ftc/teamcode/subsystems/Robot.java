@@ -224,6 +224,7 @@ public boolean driveToPosition(Pose2d pos){
     @Override
     public String toString(){
         return "Robot {" + 
+                turret.toString() +
                 intake.toString() + 
                 spindex.toString() +
                 shooter.toString() + 
