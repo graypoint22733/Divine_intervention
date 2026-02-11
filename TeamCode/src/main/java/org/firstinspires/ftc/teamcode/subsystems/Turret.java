@@ -44,7 +44,7 @@ public class Turret {
         setPos(pos);
     }
 
-    private void setPos(double pos){
+    public void setPos(double pos){
         target = pos;
         LServo.setPosition(pos);
         RServo.setPosition(pos);
