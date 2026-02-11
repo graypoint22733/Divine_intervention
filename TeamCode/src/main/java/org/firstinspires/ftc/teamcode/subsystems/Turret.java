@@ -10,7 +10,7 @@ public class Turret {
     public static final double GEAR_RATIO = (80.0 / 20.0) * (37.0 / 112.0);
 
     // Total physical range of your servo in radians (Defaulting to 300 degrees)
-    public static final double SERVO_RANGE_RAD = Math.toRadians(300);
+    public static final double SERVO_RANGE_RAD = Math.toRadians(360);
 
     public static double GOAL_X = 0.0, GOAL_Y = 0.0;
 
