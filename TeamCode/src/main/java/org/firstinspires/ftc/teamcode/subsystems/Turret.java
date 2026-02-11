@@ -5,18 +5,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.util.Pose2d;
 
 public class Turret {
-    // Calculated Gear Ratio (~1.321).
-    // If turret moves TOO FAR, change this to (1.0 / GEAR_RATIO)
     public static final double GEAR_RATIO = (80.0 / 20.0) * (37.0 / 112.0);
 
-    // Total physical range of your servo in radians (Defaulting to 300 degrees)
-    public static final double SERVO_RANGE_RAD = Math.toRadians(360);
+    public static final double SERVO_RANGE_RAD = Math.toRadians(355);
 
     public static double GOAL_X = 0.0, GOAL_Y = 0.0;
 
     private final Servo LServo, RServo;
     public double target = 0.5;
     public static boolean tracking = true;
+    public static String snitch = "";
 
     public Turret (HardwareMap map) {
         LServo = map.get(Servo.class, "TurretServoL");
@@ -42,13 +40,13 @@ public class Turret {
 
         // Apply delta to the center position (0.5)
         double pos = clamp(0.5 + servoDelta);
+        snitch = "atg " + angleToGoal + " error " + error + " servodelta " + servoDelta;
         setPos(pos);
     }
 
     private void setPos(double pos){
         target = pos;
         LServo.setPosition(pos);
-        // Mirroring RServo: if one goes 0.7, the other goes 0.3 to rotate the same direction
         RServo.setPosition(pos);
     }
 
@@ -87,6 +85,6 @@ public class Turret {
 
     @Override
     public String toString(){
-        return "Turret { " + target + "}";
+        return "Turret { " + target + "} snitch {" + snitch + "}";
     }
 }
