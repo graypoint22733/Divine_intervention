@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 
-@TeleOp
-    public class HoodOp extends LinearOpMode {
+@TeleOp(name="hood test", group="drugs are not healthy")
+public class HoodOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         Hood hood;
