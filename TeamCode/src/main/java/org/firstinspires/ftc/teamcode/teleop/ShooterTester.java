@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.subsystems.Hood;
 
@@ -38,6 +39,7 @@ public class ShooterTester extends OpMode {
     @Override
     public void init() {
         fM = hardwareMap.get(DcMotorEx.class, "shooter");
+        fM.setDirection(DcMotorSimple.Direction.REVERSE);
         hood = new Hood(hardwareMap);
         t = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
