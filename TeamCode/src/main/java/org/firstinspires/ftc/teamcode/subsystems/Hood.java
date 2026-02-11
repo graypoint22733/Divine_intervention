@@ -13,8 +13,10 @@ public class Hood {
     private double pos = 0;
 
     private static final double SERVOMIN = 0, SERVOMAX = 1;
-    private static final double ANGLEMIN = 30, ANGLEMAX = 60;
+    private static final double ANGLEMIN = 0, ANGLEMAX = 60;
     private static final double SERVO_TO_ANGLE = 10;
+
+    private static final double GRH = 60/224;
  
     public Hood (HardwareMap map) {
         servo = new ServoCaching.CachingServo(map.get(Servo.class, "hood"));
