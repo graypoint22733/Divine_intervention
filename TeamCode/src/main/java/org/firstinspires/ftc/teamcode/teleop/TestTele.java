@@ -25,7 +25,7 @@ public class TestTele extends LinearOpMode{
     public void runOpMode(){
         robot = new Robot(hardwareMap);
         robot.init();
-        robot.turret.setGoalPositions(153, 2);
+        robot.turret.setGoalPositions(144, 0);
         robot.setPose(new Pose2d(0.0, 0.0, 0.0));
 
         robot.updateTelemetry(telemetry);
