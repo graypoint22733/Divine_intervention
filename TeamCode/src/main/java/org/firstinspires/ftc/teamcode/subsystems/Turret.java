@@ -87,6 +87,6 @@ public class Turret {
 
     @Override
     public String toString(){
-        return "Turret { " + pos + "}";
+        return "Turret { " + target + "}";
     }
 }
