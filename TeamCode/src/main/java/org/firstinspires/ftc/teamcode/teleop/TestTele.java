@@ -96,6 +96,7 @@ public class TestTele extends LinearOpMode{
             telemetry.addData("target", robot.turret.target);
             telemetry.addData("goal x", Turret.GOAL_X);
             telemetry.addData("goal y", Turret.GOAL_Y);
+            telemetry.addData("usefuls", robot.turret.toString());
             }
             telemetry.update();
         }
