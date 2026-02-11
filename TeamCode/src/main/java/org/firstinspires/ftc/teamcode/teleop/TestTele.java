@@ -24,11 +24,8 @@ public class TestTele extends LinearOpMode{
     @Override
     public void runOpMode(){
         robot = new Robot(hardwareMap);
-
-        Turret.GOAL_Y = 153.0;
-        Turret.GOAL_X = 2.0;
-
         robot.init();
+        robot.turret.setGoalPositions(153, 2);
         robot.setPose(new Pose2d(0.0, 0.0, 0.0));
 
         robot.updateTelemetry(telemetry);
@@ -103,8 +100,8 @@ public class TestTele extends LinearOpMode{
             telemetry.addData("robot pinpoint pose", robot.odo.getPosition());
             telemetry.addData("pos", robot.turret.getPosition());
             telemetry.addData("target", robot.turret.target);
-            telemetry.addData("goal x", Turret.GOAL_X);
-            telemetry.addData("goal y", Turret.GOAL_Y);
+            telemetry.addData("goal x", robot.turret.GOAL_X);
+            telemetry.addData("goal y", robot.turret.GOAL_Y);
             telemetry.addData("usefuls", robot.turret.toString());
             }
             telemetry.update();
