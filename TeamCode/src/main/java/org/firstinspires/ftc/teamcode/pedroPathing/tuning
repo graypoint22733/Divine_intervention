@@ -1,0 +1,5 @@
+package org.firstinspires.ftc.teamcode.pedroPathing;
+@Configurable
+@TeleOp(name = "Tuning", group = "Pedro Pathing")
+public class Tuning extends SelectableOpMode {
+}
